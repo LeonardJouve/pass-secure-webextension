@@ -8,7 +8,7 @@ type AuthStore = {
     login: (input: LoginInput) => LoginResponse;
 };
 
-const authStore = create<AuthStore>((set) => ({
+const useAuth = create<AuthStore>((set) => ({
     isLoggedIn: false,
     user: null,
     register: Auth.register,
@@ -20,4 +20,4 @@ const authStore = create<AuthStore>((set) => ({
     },
 }));
 
-export default authStore;
+export default useAuth;
