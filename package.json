@@ -7,21 +7,27 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lingui": "env-cmd lingui extract --overwrite && lingui compile --typescript",
+    "prepare": "husky && npm run lingui"
   },
   "dependencies": {
+    "@lingui/react": "^5.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@lingui/babel-plugin-lingui-macro": "^5.2.0",
+    "@lingui/vite-plugin": "^5.2.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "env-cmd": "^10.1.0",
     "eslint": "^9.21.0",
     "eslint-config-leonardjouve": "^2.0.2",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
     "tsconfig-leonardjouve": "^1.0.1",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
