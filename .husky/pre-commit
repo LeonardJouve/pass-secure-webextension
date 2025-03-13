@@ -1,0 +1,2 @@
+npm run lingui
+git add $(git ls-files --modified src/locales/*.ts)
