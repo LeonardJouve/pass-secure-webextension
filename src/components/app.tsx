@@ -1,5 +1,6 @@
 import {Trans} from "@lingui/react/macro";
 import React, {useState} from "react";
+import {Button} from "antd";
 import useIntl from "../store/intl";
 
 const App: React.FC = () => {
@@ -12,9 +13,9 @@ const App: React.FC = () => {
             <Trans>Dropdown menu</Trans>
             <Trans>Shopping cart</Trans>
             <Trans>Chicken eggs</Trans>
-            <button onClick={() => setCount(count + 1)}>{count}</button>
-            <button onClick={() => setLocale("en")}>{"en"}</button>
-            <button onClick={() => setLocale("fr")}>{"fr"}</button>
+            <Button type="primary" onClick={() => setCount(count + 1)}>{count}</Button>
+            <Button type="primary" onClick={() => setLocale("en")}>en</Button>
+            <Button type="primary" onClick={() => setLocale("fr")}>fr</Button>
         </div>
     );
 };

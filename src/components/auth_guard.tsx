@@ -5,7 +5,7 @@ const AuthGuard: React.FC<React.PropsWithChildren> = ({children}) => {
     const {isLoggedIn} = useAuth();
 
     if (!isLoggedIn) {
-        return null;
+        // return null;
     }
 
     return (

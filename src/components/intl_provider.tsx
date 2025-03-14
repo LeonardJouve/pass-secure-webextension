@@ -5,7 +5,7 @@ import {I18nProvider} from "@lingui/react";
 import useIntl, {type Locale} from "../store/intl";
 
 const setLocal = async (locale: Locale): Promise<void> => {
-    const {messages} = await import(`../locales/${locale}/messages`) as {messages: Messages};
+    const {messages} = await import(/* @vite-ignore */ `../locales/${locale}/messages`) as {messages: Messages};
     i18n.load(locale, messages);
     i18n.activate(locale);
 };

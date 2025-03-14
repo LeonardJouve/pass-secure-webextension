@@ -10,7 +10,6 @@ export default defineConfig({
     format: "po",
     service: {
         name: "TranslationIO",
-        // @ts-expect-error untyped environment variable
-        apiKey: process.env.TRANSLATION_IO_API_KEY, // eslint-disable-line
+        apiKey: process.env["TRANSLATION_IO_API_KEY"]!, // eslint-disable-line @typescript-eslint/no-non-null-assertion, no-undef
     },
 });
