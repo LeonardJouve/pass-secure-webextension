@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {Avatar, Dropdown, Modal, type DropdownProps, type MenuProps} from "antd";
 import {LoadingOutlined, LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import useUsers from "../store/users";
 import useAuth from "../store/auth";
-import ProfileModal from "./profile_modal";
+import useRouter, {Route} from "../store/router";
 
 type Props = DropdownProps;
 
 const Profile: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
+    const {push} = useRouter();
     const [disconnectModal, disconnectModalContext] = Modal.useModal();
     const {me, getMe} = useUsers();
     const {disconnect} = useAuth();
-    const [profileModalIsOpen, setProfileModalIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (!me) {
@@ -33,7 +33,7 @@ const Profile: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
             key: 0,
             icon: <UserOutlined/>,
             label: me.username,
-            onClick: () => setProfileModalIsOpen(true),
+            onClick: () => push(Route.EDIT_PROFILE),
         },
         {
             key: 1,
@@ -60,7 +60,6 @@ const Profile: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
                 </Avatar>
             </Dropdown>
             {disconnectModalContext}
-            <ProfileModal isOpen={profileModalIsOpen} setIsOpen={setProfileModalIsOpen}/>
         </>
     );
 };

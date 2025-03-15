@@ -4,15 +4,14 @@ import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import type {Rule} from "antd/es/form";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useAuth from "../../store/auth";
+import useRouter, {Route} from "../../store/router";
 import type {RegisterInput} from "../../api/auth";
+import LocalePicker from "../locale_picker";
 
-type Props = {
-    handleLogin: () => void;
-};
-
-const Register: React.FC<Props> = ({handleLogin}) => {
+const Register: React.FC = () => {
     const {t} = useLingui();
     const {register} = useAuth();
+    const {push} = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string|null>(null);
 
@@ -26,6 +25,8 @@ const Register: React.FC<Props> = ({handleLogin}) => {
         }
     };
 
+    const handleLogin = (): void => push(Route.LOGIN);
+
     const confirmPassword: Rule = ({getFieldValue}) => ({
         validator: async (_, value): Promise<void> => {
             if (!value || getFieldValue("password") === value) {
@@ -36,60 +37,63 @@ const Register: React.FC<Props> = ({handleLogin}) => {
     });
 
     return (
-        <Form
-            name="register"
-            onFinish={handleRegister}
-        >
-            <Form.Item
-                name="email"
-                rules={[{required: true, message: t({message: "Input your Email"})}]}
+        <div>
+            <LocalePicker/>
+            <Form
+                name="register"
+                onFinish={handleRegister}
             >
-                <Input
-                    prefix={<MailOutlined/>}
-                    type="email"
-                    placeholder={t({message: "Email"})}
-                />
-            </Form.Item>
-            <Form.Item
-                name="password"
-                rules={[{required: true, message: t({message: "Input your Password"})}]}
-            >
-                <Input.Password
-                    prefix={<LockOutlined/>}
-                    placeholder={t({message: "Password"})}
-                />
-            </Form.Item>
-            <Form.Item
-                name="passwordConfirm"
-                dependencies={["password"]}
-                rules={[{required: true, message: t({message: "Confirm your Password"})}, confirmPassword]}
-            >
-                <Input.Password
-                    prefix={<LockOutlined/>}
-                    placeholder={t({message: "Confirm Password"})}
-                />
-            </Form.Item>
-            <Form.Item>
-                <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isLoading}
+                <Form.Item
+                    name="email"
+                    rules={[{required: true, message: t({message: "Input your Email"})}]}
                 >
-                    <Trans>Register</Trans>
-                </Button>
-                <Trans>or</Trans>
-                <Typography.Link onClick={handleLogin}>
-                    <Trans>Log in now</Trans>
-                </Typography.Link>
-            </Form.Item>
-            {error !== null ? (
-                <Alert
-                    type="error"
-                    showIcon={true}
-                    message={error}
-                />
-            ) : null}
-        </Form>
+                    <Input
+                        prefix={<MailOutlined/>}
+                        type="email"
+                        placeholder={t({message: "Email"})}
+                    />
+                </Form.Item>
+                <Form.Item
+                    name="password"
+                    rules={[{required: true, message: t({message: "Input your Password"})}]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined/>}
+                        placeholder={t({message: "Password"})}
+                    />
+                </Form.Item>
+                <Form.Item
+                    name="passwordConfirm"
+                    dependencies={["password"]}
+                    rules={[{required: true, message: t({message: "Confirm your Password"})}, confirmPassword]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined/>}
+                        placeholder={t({message: "Confirm Password"})}
+                    />
+                </Form.Item>
+                <Form.Item>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={isLoading}
+                    >
+                        <Trans>Register</Trans>
+                    </Button>
+                    <Trans>or</Trans>
+                    <Typography.Link onClick={handleLogin}>
+                        <Trans>Log in now</Trans>
+                    </Typography.Link>
+                </Form.Item>
+                {error !== null ? (
+                    <Alert
+                        type="error"
+                        showIcon={true}
+                        message={error}
+                    />
+                ) : null}
+            </Form>
+        </div>
     );
 };
 
