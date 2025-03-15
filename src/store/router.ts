@@ -18,7 +18,7 @@ type RouterStore = {
 const useRouter = create<RouterStore>((set) => ({
     stack: [],
     current: Route.MAIN,
-    clear: (route: Route): void => set({stack: [], current: route}),
+    clear: (current: Route): void => set({stack: [], current}),
     push: (route): void => set(({stack, current}) => ({stack: [...stack, current], current: route})),
     pop: (): void => set(({stack}) => {
         if (!stack.length) {
@@ -26,8 +26,8 @@ const useRouter = create<RouterStore>((set) => ({
         }
 
         const newStack = [...stack];
-        const top = newStack.pop();
-        return {stack: newStack, top};
+        const current = newStack.pop();
+        return {stack: newStack, current};
     }),
 }));
 
