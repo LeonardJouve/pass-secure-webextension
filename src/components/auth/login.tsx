@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Alert, Button, Form, Input, Typography} from "antd";
+import {Button, Form, Input, Typography, message} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useAuth from "../../store/auth";
@@ -9,18 +9,20 @@ import LocalePicker from "../locale_picker";
 
 const Login: React.FC = () => {
     const {t} = useLingui();
+    const [errorMessage, errorMessageContext] = message.useMessage();
     const {login} = useAuth();
     const {push} = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string|null>(null);
 
     const handleLogin = async (values: LoginInput): Promise<void> => {
-        setError(null);
         setIsLoading(true);
         const result = await login(values);
         setIsLoading(false);
         if (result.error) {
-            setError(result.data.message);
+            errorMessage.open({
+                type: "error",
+                content: result.data.message,
+            });
         }
     };
 
@@ -65,14 +67,8 @@ const Login: React.FC = () => {
                         <Trans>Register now</Trans>
                     </Typography.Link>
                 </Form.Item>
-                {error !== null ? (
-                    <Alert
-                        type="error"
-                        showIcon={true}
-                        message={error}
-                    />
-                ) : null}
             </Form>
+            {errorMessageContext}
         </div>
     );
 };
