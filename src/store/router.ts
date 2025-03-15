@@ -5,21 +5,28 @@ export enum Route {
     REGISTER,
     MAIN,
     EDIT_PROFILE,
+    CREATE_FOLDER,
+    CREATE_ENTRY,
 }
 
+type Entry = {
+    route: Route;
+    params: Record<string|number, unknown>;
+};
+
 type RouterStore = {
-    stack: Route[];
-    current: Route;
-    clear: (route: Route) => void;
-    push: (route: Route) => void;
+    stack: Entry[];
+    current: Entry;
+    clear: (route: Entry["route"], params?: Entry["params"]) => void;
+    push: (route: Entry["route"], params?: Entry["params"]) => void;
     pop: () => void;
 };
 
 const useRouter = create<RouterStore>((set) => ({
     stack: [],
-    current: Route.MAIN,
-    clear: (current: Route): void => set({stack: [], current}),
-    push: (route): void => set(({stack, current}) => ({stack: [...stack, current], current: route})),
+    current: {route: Route.MAIN, params: {}},
+    clear: (route: Entry["route"], params: Entry["params"] = {}): void => set({stack: [], current: {route, params}}),
+    push: (route, params = {}): void => set(({stack, current}) => ({stack: [...stack, current], current: {route, params}})),
     pop: (): void => set(({stack}) => {
         if (!stack.length) {
             return {};
