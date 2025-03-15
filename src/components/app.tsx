@@ -1,11 +1,10 @@
 import {Trans} from "@lingui/react/macro";
 import React, {useState} from "react";
 import {Button} from "antd";
-import useIntl from "../store/intl";
+import LocalePicker from "./locale_picker";
 
 const App: React.FC = () => {
     const [count, setCount] = useState(0);
-    const {setLocale} = useIntl();
 
     return (
         <div>
@@ -14,8 +13,7 @@ const App: React.FC = () => {
             <Trans>Shopping cart</Trans>
             <Trans>Chicken eggs</Trans>
             <Button type="primary" onClick={() => setCount(count + 1)}>{count}</Button>
-            <Button type="primary" onClick={() => setLocale("en")}>en</Button>
-            <Button type="primary" onClick={() => setLocale("fr")}>fr</Button>
+            <LocalePicker/>
         </div>
     );
 };

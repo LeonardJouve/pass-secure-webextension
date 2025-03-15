@@ -31,7 +31,7 @@ const Register: React.FC<Props> = ({handleLogin}) => {
             if (!value || getFieldValue("password") === value) {
                 return await Promise.resolve();
             }
-            return await Promise.reject(new Error(t({message: "Input your Password"})));
+            return await Promise.reject(new Error(t({message: "Confirmation does not match"})));
         },
     });
 

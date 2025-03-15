@@ -1,18 +1,25 @@
 import {create} from "zustand";
 
-const locales = ["en", "fr"] as const;
+const locales = {
+    "en": "English",
+    "fr": "Français",
+} as const;
 
-export type Locale = typeof locales[number];
+type Locales = typeof locales;
+
+export type Locale = keyof typeof locales;
 
 type IntlStore = {
     locale: Locale|null;
     defaultLocale: Locale;
     setLocale: (locale: Locale) => void;
+    getLocales: () => Locales;
+    getLocaleName: (locale: Locale) => string;
 };
 
 const getLocale = (): Locale|null => {
     const locale = localStorage.getItem("locale") as Locale;
-    if (locales.includes(locale)) {
+    if (locale in locales) {
         return locale;
     }
 
@@ -26,6 +33,8 @@ const useIntl = create<IntlStore>((set) => ({
         localStorage.setItem("locale", locale);
         set({locale});
     },
+    getLocales: (): Locales => locales,
+    getLocaleName: (locale: Locale): string => locales[locale],
 }));
 
 export default useIntl;
