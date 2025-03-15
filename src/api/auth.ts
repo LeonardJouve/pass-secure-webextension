@@ -16,7 +16,7 @@ export type LoginResponse = {
     accessToken: string;
 };
 
-class Auth {
+class AuthApi {
     static register = async (input: RegisterInput): Response<OkResponse> => await Api.fetch<OkResponse>("/register", {
         method: "POST",
         body: JSON.stringify(input),
@@ -28,4 +28,4 @@ class Auth {
     }, false);
 }
 
-export default Auth;
+export default AuthApi;

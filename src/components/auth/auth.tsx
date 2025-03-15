@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import Login from "./login";
 import Register from "./register";
 import "./auth.css";
+import LocalePicker from "../locale_picker";
 
 enum State {
     REGISTER,
@@ -13,6 +14,7 @@ const Auth: React.FC = () => {
 
     return (
         <div>
+            <LocalePicker/>
             {state === State.LOGIN ?
                 <Login handleRegister={() => setState(State.REGISTER)}/> :
                 <Register handleLogin={() => setState(State.LOGIN)}/>

@@ -2,8 +2,7 @@ import React, {useState} from "react";
 import {Alert, Button, Form, Input, Typography} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import type {Rule} from "antd/es/form";
-import {Trans} from "@lingui/react/macro";
-import {t} from "@lingui/core/macro";
+import {Trans, useLingui} from "@lingui/react/macro";
 import useAuth from "../../store/auth";
 import type {RegisterInput} from "../../api/auth";
 
@@ -12,6 +11,7 @@ type Props = {
 };
 
 const Register: React.FC<Props> = ({handleLogin}) => {
+    const {t} = useLingui();
     const {register} = useAuth();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string|null>(null);
