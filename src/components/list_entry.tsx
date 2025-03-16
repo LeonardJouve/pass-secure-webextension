@@ -87,11 +87,13 @@ const ListEntry: React.FC<Props> = ({entry}) => {
                                     />
                                 </Tooltip>
                             ) : null}
-                            <Button
-                                type="text"
-                                icon={<EditOutlined/>}
-                                onClick={handleEdit}
-                            />
+                            <Tooltip title={<Trans>Edit</Trans>}>
+                                <Button
+                                    type="text"
+                                    icon={<EditOutlined/>}
+                                    onClick={handleEdit}
+                                />
+                            </Tooltip>
                         </div>
                     )}
                 />

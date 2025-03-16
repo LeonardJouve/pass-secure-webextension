@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import useRouter from "../store/router";
 import RouterBack from "./router_back";
-import {Button, Modal} from "antd";
+import {Button, Modal, Tooltip} from "antd";
 import {Trans} from "@lingui/react/macro";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import useEntries from "../store/entries";
@@ -38,20 +38,22 @@ const EntryView: React.FC = () => {
     return (
         <div>
             <RouterBack/>
-            <Button
-                danger={true}
-                icon={<DeleteOutlined/>}
-                type="primary"
-                onClick={handleDelete}
-            >
-                <Trans>Delete</Trans>
-            </Button>
-            <Button
-                icon={<EditOutlined/>}
-                type="primary"
-                shape="circle"
-                onClick={handleEdit}
-            />
+            <Tooltip title={<Trans>Delete</Trans>}>
+                <Button
+                    danger={true}
+                    icon={<DeleteOutlined/>}
+                    type="primary"
+                    onClick={handleDelete}
+                />
+            </Tooltip>
+            <Tooltip title={<Trans>Edit</Trans>}>
+                <Button
+                    icon={<EditOutlined/>}
+                    type="primary"
+                    shape="circle"
+                    onClick={handleEdit}
+                />
+            </Tooltip>
             {deleteModalContext}
         </div>
     );

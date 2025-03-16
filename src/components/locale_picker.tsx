@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Dropdown, type DropdownProps, type MenuProps} from "antd";
+import {Button, Dropdown, Tooltip, type DropdownProps, type MenuProps} from "antd";
 import {GlobalOutlined} from "@ant-design/icons";
 import useIntl, {type Locale} from "../store/intl";
 import En from "../icons/en";
@@ -40,9 +40,9 @@ const LocalePicker: React.FC<Props> = ({placement = "bottomRight", ...props}) =>
 
     return (
         <Dropdown menu={menu} placement={placement} {...props}>
-            <Button icon={getLocaleFlag(currentLocale)}>
-                {getLocaleName(currentLocale)}
-            </Button>
+            <Tooltip title={getLocaleName(currentLocale)}>
+                <Button icon={getLocaleFlag(currentLocale)}/>
+            </Tooltip>
         </Dropdown>
     );
 };
