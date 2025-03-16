@@ -7,6 +7,7 @@ import App from "./app";
 import EditProfile from "./edit_profile";
 import CreateEntry from "./create_entry";
 import CreateFolder from "./create_folder";
+import EntryView from "./entry_view";
 
 const Router: React.FC = () => {
     const {current, clear} = useRouter();
@@ -33,6 +34,8 @@ const Router: React.FC = () => {
         return <CreateFolder/>;
     case Route.CREATE_ENTRY:
         return <CreateEntry/>;
+    case Route.ENTRY_VIEW:
+        return <EntryView/>;
     default:
         clear(Route.MAIN);
         return null;

@@ -7,6 +7,7 @@ export enum Route {
     EDIT_PROFILE,
     CREATE_FOLDER,
     CREATE_ENTRY,
+    ENTRY_VIEW,
 }
 
 type Entry = {

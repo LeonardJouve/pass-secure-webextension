@@ -5,7 +5,7 @@ import RouterBack from "./router_back";
 const CreateEntry: React.FC = () => {
     const {current} = useRouter();
 
-    const [folderId, setFolderId] = useState<number|null>(current.params["folderId"] as number|undefined ?? null);
+    const [folderId, _setFolderId] = useState<number|null>(current.params["folderId"] as number|undefined ?? null);
 
     return (
         <div>

@@ -5,7 +5,7 @@ import RouterBack from "./router_back";
 const CreateFolder: React.FC = () => {
     const {current} = useRouter();
 
-    const [parentId, setParentId] = useState<number|null>(current.params["parentId"] as number|undefined ?? null);
+    const [parentId, _setParentId] = useState<number|null>(current.params["parentId"] as number|undefined ?? null);
 
     return (
         <div>

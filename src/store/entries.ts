@@ -1,11 +1,12 @@
 import {create} from "zustand";
-import type {Response} from "../api/api";
+import type {OkResponse, Response} from "../api/api";
 import type {Entry, GetEntriesResponse} from "../api/entries";
 import EntriesApi, {type GetEntriesInput} from "../api/entries";
 
 type EntriesStore = {
     entries: Entry[];
     getEntries: (input?: GetEntriesInput) => Response<GetEntriesResponse>;
+    deleteEntry: (entryId: Entry["id"]) => Response<OkResponse>;
 };
 
 const useEntries = create<EntriesStore>((set) => ({
@@ -14,6 +15,14 @@ const useEntries = create<EntriesStore>((set) => ({
         const response = await EntriesApi.getEntries(input);
         if (!response.error) {
             set({entries: response.data});
+        }
+
+        return response;
+    },
+    deleteEntry: async (entryId): Response<OkResponse> => {
+        const response = await EntriesApi.deleteEntry(entryId);
+        if (!response.error) {
+            set(({entries}) => ({entries: entries.filter(({id}) => id !== entryId)}));
         }
 
         return response;

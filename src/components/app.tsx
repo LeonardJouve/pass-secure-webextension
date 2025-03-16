@@ -5,6 +5,7 @@ import {useLingui} from "@lingui/react/macro";
 import useFolders, {getRootFolder} from "../store/folders";
 import Profile from "./profile";
 import FolderCollapse from "./folder_collapse";
+import CreateDropdown from "./create_dropdown";
 
 const App: React.FC = () => {
     const {t} = useLingui();
@@ -38,6 +39,7 @@ const App: React.FC = () => {
             />
             <Profile/>
             <Divider/>
+            <CreateDropdown folderId={rootFolder.id}/>
             <FolderCollapse folderId={rootFolder.id}/>
         </div>
     );

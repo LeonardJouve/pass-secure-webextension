@@ -8,6 +8,7 @@ import useFolders, {getChildrenFolders} from "../store/folders";
 import CreateDropdown from "./create_dropdown";
 import useEntries, {getFolderEntries} from "../store/entries";
 import type {Entry} from "../api/entries";
+import ListEntry from "./list_entry";
 
 type Props = {
     folderId: Folder["id"];
@@ -36,13 +37,7 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
         children: <FolderCollapse folderId={childFolder.id}/>,
     }));
 
-    const renderEntry = (entry: Entry, i: number): React.ReactNode => (
-        <List.Item key={i}>
-            <List.Item.Meta
-                title={entry.name}
-            />
-        </List.Item>
-    );
+    const renderEntry = (entry: Entry, i: number): React.ReactNode => <ListEntry key={i} entry={entry}/>;
 
     if (!folderItems.length && !folderEntries.length) {
         return (
