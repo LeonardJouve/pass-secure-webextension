@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useShallow} from "zustand/react/shallow";
-import {Avatar, Collapse, Empty, Flex, List, type CollapseProps} from "antd";
+import {Avatar, Collapse, Flex, List, type CollapseProps} from "antd";
 import {FolderOpenOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import type {Folder} from "../api/folders";
@@ -57,12 +57,10 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
 
     if (!folderItems.length && !folderEntries.length) {
         return (
-            <Empty
-                image={<FolderOpenOutlined/>}
-                description={<Trans>No password saved</Trans>}
-            >
-                <CreateDropdown folderId={folderId}/>
-            </Empty>
+            <Flex gap="small" align="center" justify="center">
+                <FolderOpenOutlined/>
+                <Trans>No password</Trans>
+            </Flex>
         );
     }
 
