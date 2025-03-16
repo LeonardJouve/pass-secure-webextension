@@ -24,9 +24,14 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         getActiveTabURL().then((active) => setIsCurrentTabEntry(active !== null && active === entry.url), () => setIsCurrentTabEntry(false));
     }, [entry]);
 
-    const handleFill = (): void => console.log("TODO");
+    const handleFill: React.MouseEventHandler<HTMLElement> = (e): void => {
+        e.stopPropagation();
+        console.log("TODO");
+    };
 
-    const handleOpen = (): void => {
+    const handleOpen: React.MouseEventHandler<HTMLElement> = (e): void => {
+        e.stopPropagation();
+
         if (!entry.url) {
             return;
         }
@@ -34,7 +39,12 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         browser.tabs.create({url: entry.url});
     };
 
-    const handleEdit = (): void => push(Route.ENTRY_VIEW, {isEditing: true, entryId: entry.id});
+    const handleEdit: React.MouseEventHandler<HTMLElement> = (e): void => {
+        e.stopPropagation();
+        push(Route.ENTRY_VIEW, {isEditing: true, entryId: entry.id});
+    };
+
+    const handlePreview = (): void => push(Route.ENTRY_VIEW, {isEditing: false, entryId: entry.id});
 
     const handleCopyUsername = (): void => {
         navigator.clipboard.writeText(entry.username);
@@ -46,57 +56,70 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         copyMessage.info(<Trans>Password copied!</Trans>);
     };
 
+    const actions = [];
+    if (isCurrentTabEntry) {
+        actions.push((
+            <Button
+                type="primary"
+                onClick={handleFill}
+            >
+                <Trans>Fill</Trans>
+            </Button>
+        ));
+    }
+
+    if (entry.url) {
+        actions.push((
+            <Tooltip title={<Trans>Open in another tab</Trans>}>
+                <Button
+                    icon={<GlobalOutlined/>}
+                    type="text"
+                    onClick={handleOpen}
+                />
+            </Tooltip>
+        ));
+    }
+
+    actions.push((
+        <div onClick={(e) => e.stopPropagation()}>
+            <Dropdown menu={{items: [
+                {
+                    key: 1,
+                    label: <Trans>Copy Username</Trans>,
+                    onClick: handleCopyUsername,
+                },
+                {
+                    key: 2,
+                    label: <Trans>Copy Password</Trans>,
+                    onClick: handleCopyPassword,
+                },
+            ]}}>
+                <Button
+                    type="dashed"
+                    icon={<CopyOutlined/>}
+                />
+            </Dropdown>
+        </div>
+    ));
+
+    actions.push((
+        <Tooltip title={<Trans>Edit</Trans>}>
+            <Button
+                type="primary"
+                icon={<EditOutlined/>}
+                onClick={handleEdit}
+            />
+        </Tooltip>
+    ));
+
     return (
         <>
-            <List.Item onClick={() => console.log("clicked")}>
-                <List.Item.Meta
-                    title={entry.name}
-                    description={(
-                        <div onClick={(e) => e.stopPropagation()}>
-                            {isCurrentTabEntry ? (
-                                <Button
-                                    type="primary"
-                                    onClick={handleFill}
-                                >
-                                    <Trans>Fill</Trans>
-                                </Button>
-                            ) : null}
-                            <Dropdown menu={{items: [
-                                {
-                                    key: 1,
-                                    label: <Trans>Copy Username</Trans>,
-                                    onClick: handleCopyUsername,
-                                },
-                                {
-                                    key: 2,
-                                    label: <Trans>Copy Password</Trans>,
-                                    onClick: handleCopyPassword,
-                                },
-                            ]}}>
-                                <Button
-                                    type="dashed"
-                                    icon={<CopyOutlined/>}
-                                />
-                            </Dropdown>
-                            {entry.url ? (
-                                <Tooltip title={<Trans>Open in another tab</Trans>}>
-                                    <Button
-                                        icon={<GlobalOutlined/>}
-                                        type="text"
-                                        onClick={handleOpen}
-                                    />
-                                </Tooltip>
-                            ) : null}
-                            <Tooltip title={<Trans>Edit</Trans>}>
-                                <Button
-                                    type="text"
-                                    icon={<EditOutlined/>}
-                                    onClick={handleEdit}
-                                />
-                            </Tooltip>
-                        </div>
-                    )}
-                />
+            <List.Item
+                onClick={handlePreview}
+                title={entry.name}
+                actions={actions}
+            >
+                <List.Item.Meta title={entry.name}/>
             </List.Item>
             {copyMessageContext}
         </>

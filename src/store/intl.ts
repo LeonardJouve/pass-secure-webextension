@@ -14,7 +14,6 @@ type IntlStore = {
     defaultLocale: Locale;
     setLocale: (locale: Locale) => void;
     getLocales: () => Locales;
-    getLocaleName: (locale: Locale) => string;
 };
 
 const getLocale = (): Locale|null => {
@@ -34,7 +33,6 @@ const useIntl = create<IntlStore>((set) => ({
         set({locale});
     },
     getLocales: (): Locales => locales,
-    getLocaleName: (locale: Locale): string => locales[locale],
 }));
 
 export default useIntl;

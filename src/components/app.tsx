@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useShallow} from "zustand/shallow";
-import {Divider, Input} from "antd";
+import {Divider, Flex, Input} from "antd";
 import {useLingui} from "@lingui/react/macro";
 import useFolders, {getRootFolder} from "../store/folders";
 import Profile from "./profile";
@@ -30,18 +30,20 @@ const App: React.FC = () => {
     }
 
     return (
-        <div>
-            <Input.Search
-                placeholder={t({message: "Search"})}
-                loading={isSearching}
-                allowClear={true}
-                onSearch={handleSearch}
-            />
-            <Profile/>
+        <Flex vertical={true}>
+            <Flex gap="small">
+                <Input.Search
+                    placeholder={t({message: "Search"})}
+                    loading={isSearching}
+                    allowClear={true}
+                    onSearch={handleSearch}
+                />
+                <CreateDropdown folderId={rootFolder.id}/>
+                <Profile/>
+            </Flex>
             <Divider/>
-            <CreateDropdown folderId={rootFolder.id}/>
             <FolderCollapse folderId={rootFolder.id}/>
-        </div>
+        </Flex>
     );
 };
 

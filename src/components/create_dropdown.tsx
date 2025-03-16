@@ -7,7 +7,7 @@ import useRouter, {Route} from "../store/router";
 
 type Props = {
     folderId: Folder["id"];
-}
+};
 
 const CreateDropdown: React.FC<Props> = ({folderId}) => {
     const {push} = useRouter();

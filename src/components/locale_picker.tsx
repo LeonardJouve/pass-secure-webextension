@@ -24,7 +24,7 @@ const getLocaleFlag = (locale: Locale): React.ReactNode => {
 };
 
 const LocalePicker: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
-    const {locale, defaultLocale, setLocale, getLocales, getLocaleName} = useIntl();
+    const {locale, defaultLocale, setLocale, getLocales} = useIntl();
 
     const menu: MenuProps = {
         items: Object.entries(getLocales()).map(([localeKey, localeName], i) => ({
@@ -40,9 +40,7 @@ const LocalePicker: React.FC<Props> = ({placement = "bottomRight", ...props}) =>
 
     return (
         <Dropdown menu={menu} placement={placement} {...props}>
-            <Tooltip title={getLocaleName(currentLocale)}>
-                <Button icon={getLocaleFlag(currentLocale)}/>
-            </Tooltip>
+            <Button icon={getLocaleFlag(currentLocale)}/>
         </Dropdown>
     );
 };

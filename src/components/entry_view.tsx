@@ -50,7 +50,6 @@ const EntryView: React.FC = () => {
                 <Button
                     icon={<EditOutlined/>}
                     type="primary"
-                    shape="circle"
                     onClick={handleEdit}
                 />
             </Tooltip>

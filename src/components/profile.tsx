@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {Avatar, Dropdown, Modal, type DropdownProps, type MenuProps} from "antd";
+import {Avatar, Button, Dropdown, Modal, type DropdownProps, type MenuProps} from "antd";
 import {LoadingOutlined, LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import useUsers from "../store/users";
@@ -22,9 +22,11 @@ const Profile: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
 
     if (!me) {
         return (
-            <Avatar>
-                <LoadingOutlined/>
-            </Avatar>
+            <Button shape="circle" type="text">
+                <Avatar>
+                    <LoadingOutlined/>
+                </Avatar>
+            </Button>
         );
     }
 
@@ -55,9 +57,11 @@ const Profile: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
     return (
         <>
             <Dropdown menu={menu} placement={placement} {...props}>
-                <Avatar>
-                    {me.username[0]?.toUpperCase()}
-                </Avatar>
+                <Button shape="circle" type="text">
+                    <Avatar>
+                        {me.username[0]?.toUpperCase()}
+                    </Avatar>
+                </Button>
             </Dropdown>
             {disconnectModalContext}
         </>

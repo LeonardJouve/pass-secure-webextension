@@ -8,7 +8,7 @@ const RouterBack: React.FC = () => {
     const {pop} = useRouter();
 
     return (
-        <Tooltip title={<Trans>Back</Trans>}>
+        <Tooltip title={<Trans>Go Back</Trans>}>
             <Button
                 icon={<LeftOutlined/>}
                 type="text"
