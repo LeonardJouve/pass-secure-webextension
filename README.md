@@ -3,4 +3,3 @@ TODO:
 - Unlock
 - Theme
 - Empty folder
-- Sticky headers

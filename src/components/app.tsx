@@ -30,8 +30,8 @@ const App: React.FC = () => {
     }
 
     return (
-        <Flex vertical={true}>
-            <Flex gap="small">
+        <Flex vertical={true} style={{height: "100vh"}}>
+            <Flex gap="small" style={{padding: "15px 15px 0 15px"}}>
                 <Input.Search
                     placeholder={t({message: "Search"})}
                     loading={isSearching}
@@ -42,7 +42,9 @@ const App: React.FC = () => {
                 <Profile/>
             </Flex>
             <Divider/>
-            <FolderCollapse folderId={rootFolder.id}/>
+            <div style={{overflow: "scroll", padding: "0 15px 15px 15px"}}>
+                <FolderCollapse folderId={rootFolder.id}/>
+            </div>
         </Flex>
     );
 };
