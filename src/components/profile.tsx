@@ -1,36 +1,19 @@
-import React, {useEffect} from "react";
-import {Avatar, Button, Dropdown, Modal, type DropdownProps, type MenuProps} from "antd";
-import {LoadingOutlined, LogoutOutlined, UserOutlined} from "@ant-design/icons";
+import React from "react";
+import {Dropdown, Modal, type MenuProps} from "antd";
+import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import useUsers from "../store/users";
 import useAuth from "../store/auth";
 import useRouter, {Route} from "../store/router";
+import UserAvatar from "./user_avatar";
 
-type Props = DropdownProps;
-
-const Profile: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
+const Profile: React.FC = () => {
     const {push} = useRouter();
     const [disconnectModal, disconnectModalContext] = Modal.useModal();
-    const {me, getMe} = useUsers();
+    const {me} = useUsers();
     const {disconnect} = useAuth();
 
-    useEffect(() => {
-        if (!me) {
-            getMe();
-        }
-    }, [me]);
-
-    if (!me) {
-        return (
-            <Button shape="circle" type="text">
-                <Avatar>
-                    <LoadingOutlined/>
-                </Avatar>
-            </Button>
-        );
-    }
-
-    const menu: MenuProps = {items: [
+    const menu: MenuProps = {items: me ? [
         {
             key: 0,
             icon: <UserOutlined/>,
@@ -52,16 +35,15 @@ const Profile: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
                 onOk: disconnect,
             }),
         },
-    ]};
+    ] : []};
 
     return (
         <>
-            <Dropdown menu={menu} placement={placement} {...props}>
-                <Button shape="circle" type="text">
-                    <Avatar>
-                        {me.username[0]?.toUpperCase()}
-                    </Avatar>
-                </Button>
+            <Dropdown menu={menu} placement="bottomRight">
+                <UserAvatar
+                    userId="me"
+                    showTooltip={false}
+                />
             </Dropdown>
             {disconnectModalContext}
         </>
