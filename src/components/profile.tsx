@@ -1,5 +1,5 @@
 import React from "react";
-import {Dropdown, Modal, type MenuProps} from "antd";
+import {Button, Dropdown, Modal, type MenuProps} from "antd";
 import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import useUsers from "../store/users";
@@ -40,10 +40,12 @@ const Profile: React.FC = () => {
     return (
         <>
             <Dropdown menu={menu} placement="bottomRight">
-                <UserAvatar
-                    userId="me"
-                    showTooltip={false}
-                />
+                <Button shape="circle" type="text">
+                    <UserAvatar
+                        userId={"me"}
+                        showTooltip={false}
+                    />
+                </Button>
             </Dropdown>
             {disconnectModalContext}
         </>
