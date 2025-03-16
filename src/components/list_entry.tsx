@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import browser from "webextension-polyfill";
-import {Button, Dropdown, List, message} from "antd";
-import {CopyOutlined, EditOutlined} from "@ant-design/icons";
+import {Button, Dropdown, List, message, Tooltip} from "antd";
+import {CopyOutlined, EditOutlined, GlobalOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import type {Entry} from "../api/entries";
 import useRouter, {Route} from "../store/router";
@@ -23,6 +23,16 @@ const ListEntry: React.FC<Props> = ({entry}) => {
     useEffect(() => {
         getActiveTabURL().then((active) => setIsCurrentTabEntry(active !== null && active === entry.url), () => setIsCurrentTabEntry(false));
     }, [entry]);
+
+    const handleFill = (): void => console.log("TODO");
+
+    const handleOpen = (): void => {
+        if (!entry.url) {
+            return;
+        }
+
+        browser.tabs.create({url: entry.url});
+    };
 
     const handleEdit = (): void => push(Route.ENTRY_VIEW, {isEditing: true, entryId: entry.id});
 
@@ -46,7 +56,7 @@ const ListEntry: React.FC<Props> = ({entry}) => {
                             {isCurrentTabEntry ? (
                                 <Button
                                     type="primary"
-                                    onClick={handleEdit}
+                                    onClick={handleFill}
                                 >
                                     <Trans>Fill</Trans>
                                 </Button>
@@ -68,6 +78,15 @@ const ListEntry: React.FC<Props> = ({entry}) => {
                                     icon={<CopyOutlined/>}
                                 />
                             </Dropdown>
+                            {entry.url ? (
+                                <Tooltip title={<Trans>Open in another tab</Trans>}>
+                                    <Button
+                                        icon={<GlobalOutlined/>}
+                                        type="text"
+                                        onClick={handleOpen}
+                                    />
+                                </Tooltip>
+                            ) : null}
                             <Button
                                 type="text"
                                 icon={<EditOutlined/>}
