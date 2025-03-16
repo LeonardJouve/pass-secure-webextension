@@ -3,7 +3,7 @@ import type {Response} from "./api";
 import Api from "./api";
 
 export type Folder = {
-    id: User["id"];
+    id: number;
     userIds: User["id"][];
     ownerId: User["id"];
     name: string;

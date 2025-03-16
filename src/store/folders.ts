@@ -20,4 +20,8 @@ const useFolders = create<FoldersStore>((set) => ({
     },
 }));
 
+export const getChildrenFolders = (folderId: number): (state: FoldersStore) => Folder[] => (state) => state.folders.filter(({parentId}) => parentId === folderId);
+
+export const getRootFolder = (): (state: FoldersStore) => Folder|null => (state) => state.folders.find(({parentId}) => parentId === null) ?? null;
+
 export default useFolders;
