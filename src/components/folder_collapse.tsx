@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useShallow} from "zustand/react/shallow";
-import {Avatar, Collapse, Empty, List, type CollapseProps} from "antd";
+import {Avatar, Collapse, Empty, Flex, List, type CollapseProps} from "antd";
 import {FolderOpenOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import type {Folder} from "../api/folders";
@@ -37,15 +37,17 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
             key: i,
             showArrow: false,
             label: (
-                <div>
+                <Flex align="center">
                     <Trans>{childFolder.name}</Trans>
-                    {avatars.length ? (
-                        <Avatar.Group>
-                            {avatars}
-                        </Avatar.Group>
-                    ) : null}
-                    <CreateDropdown folderId={childFolder.id}/>
-                </div>
+                    <Flex gap="small" style={{marginLeft: "auto", marginRight: 0}}>
+                        {avatars.length ? (
+                            <Avatar.Group>
+                                {avatars}
+                            </Avatar.Group>
+                        ) : null}
+                        <CreateDropdown folderId={childFolder.id}/>
+                    </Flex>
+                </Flex>
             ),
             children: <FolderCollapse folderId={childFolder.id}/>,
         };
@@ -65,7 +67,7 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
     }
 
     return (
-        <div>
+        <Flex vertical={true}>
             {childrenFolders.length ? (
                 <Collapse
                     accordion={true}
@@ -79,7 +81,7 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
                     renderItem={renderEntry}
                 />
             ) : null}
-        </div>
+        </Flex>
     );
 };
 

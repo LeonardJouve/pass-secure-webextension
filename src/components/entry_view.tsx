@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import useRouter from "../store/router";
 import RouterBack from "./router_back";
-import {Button, Modal, Tooltip} from "antd";
+import {Button, Flex, Modal, Tooltip} from "antd";
 import {Trans} from "@lingui/react/macro";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import useEntries from "../store/entries";
@@ -36,7 +36,7 @@ const EntryView: React.FC = () => {
     const handleEdit = (): void => setIsEditing(!isEditing);
 
     return (
-        <div>
+        <Flex>
             <RouterBack/>
             <Tooltip title={<Trans>Delete</Trans>}>
                 <Button
@@ -54,7 +54,7 @@ const EntryView: React.FC = () => {
                 />
             </Tooltip>
             {deleteModalContext}
-        </div>
+        </Flex>
     );
 };
 

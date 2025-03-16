@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Form, Input, message, Typography} from "antd";
+import {Button, Flex, Form, Input, message, Typography} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import type {Rule} from "antd/es/form";
 import {Trans, useLingui} from "@lingui/react/macro";
@@ -39,7 +39,7 @@ const Register: React.FC = () => {
     });
 
     return (
-        <div>
+        <Flex>
             <LocalePicker/>
             <Form
                 name="register"
@@ -89,7 +89,7 @@ const Register: React.FC = () => {
                 </Form.Item>
                 {errorMessageContext}
             </Form>
-        </div>
+        </Flex>
     );
 };
 

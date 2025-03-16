@@ -3,7 +3,6 @@ import {createRoot} from "react-dom/client";
 import ThemeProvider from "./theme_provider.tsx";
 import IntlProvider from "./intl_provider.tsx";
 import Router from "./router.tsx";
-import "../styles/main.css";
 
 const root = document.getElementById("root");
 

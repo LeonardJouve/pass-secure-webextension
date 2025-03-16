@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Form, Input, Typography, message} from "antd";
+import {Button, Flex, Form, Input, Typography, message} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useAuth from "../../store/auth";
@@ -29,7 +29,7 @@ const Login: React.FC = () => {
     const handleRegister = (): void => push(Route.REGISTER);
 
     return (
-        <div>
+        <Flex>
             <LocalePicker/>
             <Form
                 name="login"
@@ -69,7 +69,7 @@ const Login: React.FC = () => {
                 </Form.Item>
             </Form>
             {errorMessageContext}
-        </div>
+        </Flex>
     );
 };
 
