@@ -56,31 +56,15 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         copyMessage.info(<Trans>Password copied!</Trans>);
     };
 
-    const actions = [];
-    if (isCurrentTabEntry) {
-        actions.push((
+    const actions = [(
+        <Tooltip title={<Trans>Edit</Trans>}>
             <Button
                 type="primary"
-                onClick={handleFill}
-            >
-                <Trans>Fill</Trans>
-            </Button>
-        ));
-    }
-
-    if (entry.url) {
-        actions.push((
-            <Tooltip title={<Trans>Open in another tab</Trans>}>
-                <Button
-                    icon={<GlobalOutlined/>}
-                    type="text"
-                    onClick={handleOpen}
-                />
-            </Tooltip>
-        ));
-    }
-
-    actions.push((
+                icon={<EditOutlined/>}
+                onClick={handleEdit}
+            />
+        </Tooltip>
+    ), (
         <div onClick={(e) => e.stopPropagation()}>
             <Dropdown menu={{items: [
                 {
@@ -100,24 +84,37 @@ const ListEntry: React.FC<Props> = ({entry}) => {
                 />
             </Dropdown>
         </div>
-    ));
+    )];
 
-    actions.push((
-        <Tooltip title={<Trans>Edit</Trans>}>
+    if (entry.url) {
+        actions.push((
+            <Tooltip title={<Trans>Open in another tab</Trans>}>
+                <Button
+                    icon={<GlobalOutlined/>}
+                    type="text"
+                    onClick={handleOpen}
+                />
+            </Tooltip>
+        ));
+    }
+
+    if (isCurrentTabEntry) {
+        actions.push((
             <Button
                 type="primary"
-                icon={<EditOutlined/>}
-                onClick={handleEdit}
-            />
-        </Tooltip>
-    ));
+                onClick={handleFill}
+            >
+                <Trans>Fill</Trans>
+            </Button>
+        ));
+    }
 
     return (
         <>
             <List.Item
                 onClick={handlePreview}
                 title={entry.name}
-                actions={actions}
+                actions={actions.reverse()}
             >
                 <List.Item.Meta title={entry.name}/>
             </List.Item>

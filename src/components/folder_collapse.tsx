@@ -52,10 +52,12 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
 
     return (
         <div>
-            <Collapse
-                accordion={true}
-                items={folderItems}
-            />
+            {childrenFolders.length ? (
+                <Collapse
+                    accordion={true}
+                    items={folderItems}
+                />
+            ) : null}
             {folderEntries.length ? (
                 <List
                     itemLayout="horizontal"
