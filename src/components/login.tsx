@@ -1,23 +1,22 @@
 import React, {useState} from "react";
-import {Button, Flex, Form, Input, message, Typography} from "antd";
+import {Button, Flex, Form, Input, Typography, message} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
-import type {Rule} from "antd/es/form";
 import {Trans, useLingui} from "@lingui/react/macro";
-import useAuth from "../../store/auth";
-import useRouter, {Route} from "../../store/router";
-import type {RegisterInput} from "../../api/auth";
-import LocalePicker from "../locale_picker";
+import useAuth from "../store/auth";
+import useRouter, {Route} from "../store/router";
+import type {LoginInput} from "../api/auth";
+import LocalePicker from "./locale_picker";
 
-const Register: React.FC = () => {
+const Login: React.FC = () => {
     const {t} = useLingui();
     const [errorMessage, errorMessageContext] = message.useMessage();
-    const {register} = useAuth();
+    const {login} = useAuth();
     const {push} = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const handleRegister = async (values: RegisterInput): Promise<void> => {
+    const handleLogin = async (values: LoginInput): Promise<void> => {
         setIsLoading(true);
-        const result = await register(values);
+        const result = await login(values);
         setIsLoading(false);
         if (result.error) {
             errorMessage.open({
@@ -27,23 +26,14 @@ const Register: React.FC = () => {
         }
     };
 
-    const handleLogin = (): void => push(Route.LOGIN);
-
-    const confirmPassword: Rule = ({getFieldValue}) => ({
-        validator: async (_, value): Promise<void> => {
-            if (!value || getFieldValue("password") === value) {
-                return await Promise.resolve();
-            }
-            return await Promise.reject(new Error(t({message: "Confirmation does not match"})));
-        },
-    });
+    const handleRegister = (): void => push(Route.REGISTER);
 
     return (
         <Flex>
             <LocalePicker/>
             <Form
-                name="register"
-                onFinish={handleRegister}
+                name="login"
+                onFinish={handleLogin}
             >
                 <Form.Item
                     name="email"
@@ -64,33 +54,23 @@ const Register: React.FC = () => {
                         placeholder={t({message: "Password"})}
                     />
                 </Form.Item>
-                <Form.Item
-                    name="passwordConfirm"
-                    dependencies={["password"]}
-                    rules={[{required: true, message: t({message: "Confirm your Password"})}, confirmPassword]}
-                >
-                    <Input.Password
-                        prefix={<LockOutlined/>}
-                        placeholder={t({message: "Confirm Password"})}
-                    />
-                </Form.Item>
                 <Form.Item>
                     <Button
                         type="primary"
                         htmlType="submit"
                         loading={isLoading}
                     >
-                        <Trans>Register</Trans>
+                        <Trans>Log in</Trans>
                     </Button>
                     <Trans>or</Trans>
-                    <Typography.Link onClick={handleLogin}>
-                        <Trans>Log in now</Trans>
+                    <Typography.Link onClick={handleRegister}>
+                        <Trans>Register now</Trans>
                     </Typography.Link>
                 </Form.Item>
-                {errorMessageContext}
             </Form>
+            {errorMessageContext}
         </Flex>
     );
 };
 
-export default Register;
+export default Login;

@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Dropdown, Tooltip, type DropdownProps, type MenuProps} from "antd";
+import {Button, Dropdown, type DropdownProps, type MenuProps} from "antd";
 import {GlobalOutlined} from "@ant-design/icons";
 import useIntl, {type Locale} from "../store/intl";
 import En from "../icons/en";

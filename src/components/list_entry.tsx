@@ -48,12 +48,12 @@ const ListEntry: React.FC<Props> = ({entry}) => {
 
     const handleCopyUsername = (): void => {
         navigator.clipboard.writeText(entry.username);
-        copyMessage.info(<Trans>Username copied!</Trans>);
+        copyMessage.info(<Trans>Username copied !</Trans>);
     };
 
     const handleCopyPassword = (): void => {
         navigator.clipboard.writeText(entry.password);
-        copyMessage.info(<Trans>Password copied!</Trans>);
+        copyMessage.info(<Trans>Password copied !</Trans>);
     };
 
     const actions = [(

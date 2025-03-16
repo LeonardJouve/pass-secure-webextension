@@ -8,6 +8,7 @@ export enum Route {
     CREATE_FOLDER,
     CREATE_ENTRY,
     ENTRY_VIEW,
+    UNLOCK,
 }
 
 type Entry = {

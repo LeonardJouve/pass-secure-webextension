@@ -1,17 +1,22 @@
 import React, {useEffect} from "react";
 import useRouter, {Route} from "../store/router";
-import Login from "./auth/login";
-import Register from "./auth/register";
+import Login from "./login";
+import Register from "./register";
 import useAuth from "../store/auth";
 import App from "./app";
 import EditProfile from "./edit_profile";
 import CreateEntry from "./create_entry";
 import CreateFolder from "./create_folder";
 import EntryView from "./entry_view";
+import Unlock from "./unlock";
 
 const AUTH_ROUTES = [
     Route.LOGIN,
     Route.REGISTER,
+];
+
+const LOCKED_ROUTES = [
+    Route.UNLOCK,
 ];
 
 const MAIN_ROUTES = [
@@ -24,12 +29,16 @@ const MAIN_ROUTES = [
 
 const Router: React.FC = () => {
     const {current, clear} = useRouter();
-    const {isLoggedIn} = useAuth();
+    const {isLoggedIn, isLocked} = useAuth();
 
     useEffect(() => {
         if (!isLoggedIn && !AUTH_ROUTES.includes(current.route)) {
             clear(Route.LOGIN);
-        } else if (isLoggedIn && MAIN_ROUTES.includes(current.route)) {
+        }
+        if (isLoggedIn && isLocked && !LOCKED_ROUTES.includes(current.route)) {
+            clear(Route.UNLOCK);
+        }
+        if (isLoggedIn && !isLocked && !MAIN_ROUTES.includes(current.route)) {
             clear(Route.MAIN);
         }
     }, [isLoggedIn]);
@@ -40,6 +49,15 @@ const Router: React.FC = () => {
             return <Login/>;
         case Route.REGISTER:
             return <Register/>;
+        default:
+            return null;
+        }
+    }
+
+    if (isLocked) {
+        switch (current.route) {
+        case Route.UNLOCK:
+            return <Unlock/>;
         default:
             return null;
         }
