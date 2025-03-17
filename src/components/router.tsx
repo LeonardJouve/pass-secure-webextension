@@ -10,21 +10,21 @@ import CreateFolder from "./create_folder";
 import EntryView from "./entry_view";
 import Unlock from "./unlock";
 
-const AUTH_ROUTES: Partial<Record<Route, React.FC>> = {
-    [Route.LOGIN]: Login,
-    [Route.REGISTER]: Register,
-};
-
-const LOCKED_ROUTES: Partial<Record<Route, React.FC>> = {
-    [Route.UNLOCK]: Unlock,
-};
-
-const MAIN_ROUTES: Partial<Record<Route, React.FC>> = {
-    [Route.MAIN]: App,
-    [Route.EDIT_PROFILE]: EditProfile,
-    [Route.CREATE_FOLDER]: CreateFolder,
-    [Route.CREATE_ENTRY]: CreateEntry,
-    [Route.ENTRY_VIEW]: EntryView,
+const COMPONENTS: Record<Status, Partial<Record<Route, React.FC>>> = {
+    [Status.DISCONNECTED]: {
+        [Route.LOGIN]: Login,
+        [Route.REGISTER]: Register,
+    },
+    [Status.LOCKED]: {
+        [Route.UNLOCK]: Unlock,
+    },
+    [Status.CONNECTED]: {
+        [Route.MAIN]: App,
+        [Route.EDIT_PROFILE]: EditProfile,
+        [Route.CREATE_FOLDER]: CreateFolder,
+        [Route.CREATE_ENTRY]: CreateEntry,
+        [Route.ENTRY_VIEW]: EntryView,
+    },
 };
 
 const Router: React.FC = () => {
@@ -32,38 +32,15 @@ const Router: React.FC = () => {
     const {status} = useAuth();
 
     useEffect(() => {
-        switch (status) {
-        case Status.DISCONNECTED:
-            if (!AUTH_ROUTES[current.route]) {
-                clear(Route.LOGIN);
+        if (!COMPONENTS[status][current.route]) {
+            const [fallbackRoute] = Object.keys(COMPONENTS[status]);
+            if (fallbackRoute) {
+                clear(Number(fallbackRoute));
             }
-            break;
-        case Status.LOCKED:
-            if (!LOCKED_ROUTES[current.route]) {
-                clear(Route.UNLOCK);
-            }
-            break;
-        case Status.CONNECTED:
-            if (!MAIN_ROUTES[current.route]) {
-                clear(Route.MAIN);
-            }
-            break;
         }
     }, [status]);
 
-    let Component: React.FC|undefined;
-    switch (status) {
-    case Status.DISCONNECTED:
-        Component = AUTH_ROUTES[current.route];
-        break;
-    case Status.LOCKED:
-        Component = LOCKED_ROUTES[current.route];
-        break;
-    case Status.CONNECTED:
-        Component = MAIN_ROUTES[current.route];
-        break;
-    }
-
+    const Component: React.FC|undefined = COMPONENTS[status][current.route];
     return Component ? <Component/> : null;
 };
 
