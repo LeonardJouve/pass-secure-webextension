@@ -10,22 +10,22 @@ import CreateFolder from "./create_folder";
 import EntryView from "./entry_view";
 import Unlock from "./unlock";
 
-const AUTH_ROUTES = [
-    Route.LOGIN,
-    Route.REGISTER,
-];
+const AUTH_ROUTES: Partial<Record<Route, React.FC>> = {
+    [Route.LOGIN]: Login,
+    [Route.REGISTER]: Register,
+};
 
-const LOCKED_ROUTES = [
-    Route.UNLOCK,
-];
+const LOCKED_ROUTES: Partial<Record<Route, React.FC>> = {
+    [Route.UNLOCK]: Unlock,
+};
 
-const MAIN_ROUTES = [
-    Route.MAIN,
-    Route.EDIT_PROFILE,
-    Route.CREATE_FOLDER,
-    Route.CREATE_ENTRY,
-    Route.ENTRY_VIEW,
-];
+const MAIN_ROUTES: Partial<Record<Route, React.FC>> = {
+    [Route.MAIN]: App,
+    [Route.EDIT_PROFILE]: EditProfile,
+    [Route.CREATE_FOLDER]: CreateFolder,
+    [Route.CREATE_ENTRY]: CreateEntry,
+    [Route.ENTRY_VIEW]: EntryView,
+};
 
 const Router: React.FC = () => {
     const {current, clear} = useRouter();
@@ -34,54 +34,37 @@ const Router: React.FC = () => {
     useEffect(() => {
         switch (status) {
         case Status.DISCONNECTED:
-            if (!AUTH_ROUTES.includes(current.route)) {
+            if (!AUTH_ROUTES[current.route]) {
                 clear(Route.LOGIN);
             }
             break;
         case Status.LOCKED:
-            if (!LOCKED_ROUTES.includes(current.route)) {
+            if (!LOCKED_ROUTES[current.route]) {
                 clear(Route.UNLOCK);
             }
             break;
         case Status.CONNECTED:
-            if (!MAIN_ROUTES.includes(current.route)) {
+            if (!MAIN_ROUTES[current.route]) {
                 clear(Route.MAIN);
             }
             break;
         }
     }, [status]);
 
+    let Component: React.FC|undefined;
     switch (status) {
     case Status.DISCONNECTED:
-        switch (current.route) {
-        case Route.LOGIN:
-            return <Login/>;
-        case Route.REGISTER:
-            return <Register/>;
-        }
+        Component = AUTH_ROUTES[current.route];
         break;
     case Status.LOCKED:
-        switch (current.route) {
-        case Route.UNLOCK:
-            return <Unlock/>;
-        }
+        Component = LOCKED_ROUTES[current.route];
         break;
     case Status.CONNECTED:
-        switch (current.route) {
-        case Route.MAIN:
-            return <App/>;
-        case Route.EDIT_PROFILE:
-            return <EditProfile/>;
-        case Route.CREATE_FOLDER:
-            return <CreateFolder/>;
-        case Route.CREATE_ENTRY:
-            return <CreateEntry/>;
-        case Route.ENTRY_VIEW:
-            return <EntryView/>;
-        }
+        Component = MAIN_ROUTES[current.route];
+        break;
     }
 
-    return null;
+    return Component ? <Component/> : null;
 };
 
 export default Router;
