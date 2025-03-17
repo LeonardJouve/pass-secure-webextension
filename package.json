@@ -28,7 +28,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "env-cmd": "^10.1.0",
     "eslint": "^9.21.0",
-    "eslint-config-leonardjouve": "^2.0.4",
+    "eslint-config-leonardjouve": "^2.0.5",
     "globals": "^15.15.0",
     "husky": "^9.1.7",
     "tsconfig-leonardjouve": "^1.0.1",

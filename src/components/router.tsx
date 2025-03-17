@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import useRouter, {Route} from "../store/router";
 import Login from "./login";
 import Register from "./register";
-import useAuth from "../store/auth";
+import useAuth, {Status} from "../store/auth";
 import App from "./app";
 import EditProfile from "./edit_profile";
 import CreateEntry from "./create_entry";
@@ -29,54 +29,59 @@ const MAIN_ROUTES = [
 
 const Router: React.FC = () => {
     const {current, clear} = useRouter();
-    const {isLoggedIn, isLocked} = useAuth();
+    const {status} = useAuth();
 
     useEffect(() => {
-        if (!isLoggedIn && !AUTH_ROUTES.includes(current.route)) {
-            clear(Route.LOGIN);
+        switch (status) {
+        case Status.DISCONNECTED:
+            if (!AUTH_ROUTES.includes(current.route)) {
+                clear(Route.LOGIN);
+            }
+            break;
+        case Status.LOCKED:
+            if (!LOCKED_ROUTES.includes(current.route)) {
+                clear(Route.UNLOCK);
+            }
+            break;
+        case Status.CONNECTED:
+            if (!MAIN_ROUTES.includes(current.route)) {
+                clear(Route.MAIN);
+            }
+            break;
         }
-        if (isLoggedIn && isLocked && !LOCKED_ROUTES.includes(current.route)) {
-            clear(Route.UNLOCK);
-        }
-        if (isLoggedIn && !isLocked && !MAIN_ROUTES.includes(current.route)) {
-            clear(Route.MAIN);
-        }
-    }, [isLoggedIn]);
+    }, [status]);
 
-    if (!isLoggedIn) {
+    switch (status) {
+    case Status.DISCONNECTED:
         switch (current.route) {
         case Route.LOGIN:
             return <Login/>;
         case Route.REGISTER:
             return <Register/>;
-        default:
-            return null;
         }
-    }
-
-    if (isLocked) {
+        break;
+    case Status.LOCKED:
         switch (current.route) {
         case Route.UNLOCK:
             return <Unlock/>;
-        default:
-            return null;
+        }
+        break;
+    case Status.CONNECTED:
+        switch (current.route) {
+        case Route.MAIN:
+            return <App/>;
+        case Route.EDIT_PROFILE:
+            return <EditProfile/>;
+        case Route.CREATE_FOLDER:
+            return <CreateFolder/>;
+        case Route.CREATE_ENTRY:
+            return <CreateEntry/>;
+        case Route.ENTRY_VIEW:
+            return <EntryView/>;
         }
     }
 
-    switch (current.route) {
-    case Route.MAIN:
-        return <App/>;
-    case Route.EDIT_PROFILE:
-        return <EditProfile/>;
-    case Route.CREATE_FOLDER:
-        return <CreateFolder/>;
-    case Route.CREATE_ENTRY:
-        return <CreateEntry/>;
-    case Route.ENTRY_VIEW:
-        return <EntryView/>;
-    default:
-        return null;
-    }
+    return null;
 };
 
 export default Router;

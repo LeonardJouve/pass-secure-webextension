@@ -3,9 +3,14 @@ import type {LoginInput, LoginResponse, RegisterInput} from "../api/auth";
 import AuthApi from "../api/auth";
 import type {OkResponse, Response} from "../api/api";
 
+export enum Status {
+    DISCONNECTED,
+    LOCKED,
+    CONNECTED,
+}
+
 type AuthStore = {
-    isLoggedIn: boolean;
-    isLocked: boolean;
+    status: Status;
     register: (input: RegisterInput) => Response<OkResponse>;
     login: (input: LoginInput) => Response<LoginResponse>;
     disconnect: () => void;
@@ -13,17 +18,18 @@ type AuthStore = {
 };
 
 const useAuth = create<AuthStore>((set) => ({
-    isLoggedIn: false,
-    isLocked: true,
+    status: Status.DISCONNECTED,
     register: AuthApi.register,
     login: async (input): Response<LoginResponse> => {
         const response = await AuthApi.login(input);
-        set({isLoggedIn: !response.error});
+        if (!response.error) {
+            set({status: Status.CONNECTED});
+        }
 
         return response;
     },
-    disconnect: (): void => set({isLoggedIn: false}),
-    unlock: (): void => set({isLocked: false}),
+    disconnect: (): void => set({status: Status.DISCONNECTED}),
+    unlock: (): void => set({status: Status.CONNECTED}),
 }));
 
 export default useAuth;
