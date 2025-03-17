@@ -31,7 +31,7 @@ const LocalePicker: React.FC<Props> = ({placement = "bottomRight", ...props}) =>
             key: i,
             icon: getLocaleFlag(localeKey as Locale),
             label: localeName,
-            disabled: localeKey === locale,
+            disabled: localeKey === (locale ?? defaultLocale),
             onClick: () => setLocale(localeKey as Locale),
         })),
     };

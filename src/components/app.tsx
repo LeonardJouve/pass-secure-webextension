@@ -6,11 +6,13 @@ import useFolders, {getRootFolder} from "../store/folders";
 import Profile from "./profile";
 import FolderCollapse from "./folder_collapse";
 import CreateDropdown from "./create_dropdown";
+import useEntries from "../store/entries";
 
 const App: React.FC = () => {
     const {t} = useLingui();
     const rootFolder = useFolders(useShallow(getRootFolder()));
     const {folders, getFolders} = useFolders();
+    const {entries, getEntries} = useEntries();
     const [isSearching, setIsSearching] = useState<boolean>(false);
 
     useEffect(() => {
@@ -19,9 +21,16 @@ const App: React.FC = () => {
         }
     }, [folders]);
 
+    useEffect(() => {
+        if (!entries.length) {
+            getEntries();
+        }
+    }, [entries]);
+
     const handleSearch = async (search: string): Promise<void> => {
         setIsSearching(true);
         await getFolders({search});
+        await getEntries({search});
         setIsSearching(false);
     };
 

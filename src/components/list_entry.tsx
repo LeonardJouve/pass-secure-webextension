@@ -115,6 +115,7 @@ const ListEntry: React.FC<Props> = ({entry}) => {
                 onClick={handlePreview}
                 title={entry.name}
                 actions={actions.reverse()}
+                style={{cursor: "pointer"}}
             >
                 <List.Item.Meta title={entry.name}/>
             </List.Item>
