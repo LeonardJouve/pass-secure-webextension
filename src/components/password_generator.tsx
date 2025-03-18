@@ -33,6 +33,12 @@ type GenerateOption = {
     allow: GenerateAllow;
 };
 
+type Props = {
+    password: string;
+    setPassword: (password: string) => void;
+    disabled: boolean;
+};
+
 const generate = ({length, allow}: GenerateOption): string => {
     const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const number = "0123456789";
@@ -61,12 +67,11 @@ const getPasswordStrength = async (password: string): Promise<PasswordStrength> 
     default:
         return PasswordStrength.VERY_STRONG;
     }
-}
+};
 
-const PasswordGenerator: React.FC = () => {
+const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) => {
     const {t} = useLingui();
     const [overwriteModal, overwriteModalContext] = useModal();
-    const [password, setPassword] = useState<string>("");
     const [isVisible, setIsVisible] = useState<boolean>(true);
     const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(PasswordStrength.UNSAFE);
     const [options, setOptions] = useState<GenerateOption>({
@@ -93,7 +98,7 @@ const PasswordGenerator: React.FC = () => {
             overwriteModal.confirm({
                 title: <Trans>Overwrite</Trans>,
                 icon: <EditOutlined/>,
-                content: <Trans>Are you sure you want to <strong>Overwrite</strong> current Password</Trans>,
+                content: <Trans>Are you sure you want to <strong>Overwrite</strong> current password</Trans>,
                 okText: <Trans>Ok</Trans>,
                 okType: "danger",
                 okButtonProps: {type: "primary"},
@@ -154,7 +159,7 @@ const PasswordGenerator: React.FC = () => {
                 value={password}
                 placeholder={t({message: "Password"})}
                 onChange={handleChange}
-                suffix={(
+                suffix={disabled ? null : (
                     <Flex gap="small">
                         <Button
                             icon={isVisible ? <EyeOutlined/> : <EyeInvisibleOutlined/>}
@@ -168,22 +173,27 @@ const PasswordGenerator: React.FC = () => {
                         />
                     </Flex>
                 )}
+                disabled={disabled}
             />
-            <span style={{color: PASSWORD_STRENGTH_COLORS[passwordStrength]}}>
-                {PasswordIndicator}
-            </span>
-            <Trans>Length: </Trans>{options.length}
-            <Slider
-                min={5}
-                max={35}
-                value={options.length}
-                onChange={handleLength}
-            />
-            <Checkbox.Group
-                options={checkboxOptions}
-                value={Object.keys(options.allow) as AllowKey[]}
-                onChange={handleCheck}
-            />
+            {disabled ? null : (
+                <>
+                    <span style={{color: PASSWORD_STRENGTH_COLORS[passwordStrength]}}>
+                        {PasswordIndicator}
+                    </span>
+                    <Trans>Length: </Trans>{options.length}
+                    <Slider
+                        min={5}
+                        max={35}
+                        value={options.length}
+                        onChange={handleLength}
+                    />
+                    <Checkbox.Group
+                        options={checkboxOptions}
+                        value={Object.keys(options.allow) as AllowKey[]}
+                        onChange={handleCheck}
+                    />
+                </>
+            )}
             {overwriteModalContext}
         </Flex>
     );

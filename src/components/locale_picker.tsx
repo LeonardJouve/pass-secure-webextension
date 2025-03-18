@@ -1,11 +1,8 @@
 import React from "react";
-import {Button, Dropdown, type DropdownProps, type MenuProps} from "antd";
-import {GlobalOutlined} from "@ant-design/icons";
+import {Button, Dropdown, type MenuProps} from "antd";
 import useIntl, {type Locale} from "../store/intl";
 import En from "../icons/en";
 import Fr from "../icons/fr";
-
-type Props = DropdownProps;
 
 const getLocaleFlag = (locale: Locale): React.ReactNode => {
     const props = {
@@ -18,12 +15,10 @@ const getLocaleFlag = (locale: Locale): React.ReactNode => {
         return <En {...props}/>;
     case "fr":
         return <Fr {...props}/>;
-    default:
-        return <GlobalOutlined {...props}/>;
     }
 };
 
-const LocalePicker: React.FC<Props> = ({placement = "bottomRight", ...props}) => {
+const LocalePicker: React.FC = () => {
     const {locale, defaultLocale, setLocale, getLocales} = useIntl();
 
     const menu: MenuProps = {
@@ -39,7 +34,7 @@ const LocalePicker: React.FC<Props> = ({placement = "bottomRight", ...props}) =>
     const currentLocale = locale ?? defaultLocale;
 
     return (
-        <Dropdown menu={menu} placement={placement} {...props}>
+        <Dropdown menu={menu}>
             <Button icon={getLocaleFlag(currentLocale)}/>
         </Dropdown>
     );
