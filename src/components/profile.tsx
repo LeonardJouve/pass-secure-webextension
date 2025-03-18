@@ -31,6 +31,7 @@ const Profile: React.FC = () => {
                 content: <Trans>Are you sure you want to <strong>Disconnect</strong></Trans>,
                 okText: <Trans>Ok</Trans>,
                 okType: "danger",
+                okButtonProps: {type: "primary"},
                 cancelText: <Trans>No</Trans>,
                 onOk: disconnect,
             }),

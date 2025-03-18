@@ -5,6 +5,7 @@ import {Button, Flex, Modal, Tooltip} from "antd";
 import {Trans} from "@lingui/react/macro";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import useEntries from "../store/entries";
+import PasswordGenerator from "./password_generator";
 
 const EntryView: React.FC = () => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
@@ -27,6 +28,7 @@ const EntryView: React.FC = () => {
             okText: <Trans>Ok</Trans>,
             cancelText: <Trans>No</Trans>,
             okType: "danger",
+            okButtonProps: {type: "primary"},
             onOk: () => {
                 deleteEntry(entryId);
             },
@@ -36,7 +38,7 @@ const EntryView: React.FC = () => {
     const handleEdit = (): void => setIsEditing(!isEditing);
 
     return (
-        <Flex>
+        <Flex vertical={true}>
             <RouterBack/>
             <Tooltip title={<Trans>Delete</Trans>}>
                 <Button
@@ -53,6 +55,7 @@ const EntryView: React.FC = () => {
                     onClick={handleEdit}
                 />
             </Tooltip>
+            <PasswordGenerator/>
             {deleteModalContext}
         </Flex>
     );
