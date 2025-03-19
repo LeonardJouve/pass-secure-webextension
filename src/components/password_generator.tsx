@@ -1,24 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Button, Checkbox, Flex, Input, Slider, type CheckboxOptionType} from "antd";
 import {Trans, useLingui} from "@lingui/react/macro";
 import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SyncOutlined} from "@ant-design/icons";
 import useModal from "antd/es/modal/useModal";
-
-enum PasswordStrength {
-    UNSAFE,
-    WEAK,
-    MEDIUM,
-    STRONG,
-    VERY_STRONG,
-}
-
-const PASSWORD_STRENGTH_COLORS: Record<PasswordStrength, string> = {
-    [PasswordStrength.UNSAFE]: "#ff4d4f",
-    [PasswordStrength.WEAK]: "#ff7a45",
-    [PasswordStrength.MEDIUM]: "#faad14",
-    [PasswordStrength.STRONG]: "#52c41a",
-    [PasswordStrength.VERY_STRONG]: "#1890ff"
-};
+import PasswordStrengthIndicator from "./password_strength_indicator";
 
 type GenerateAllow = {
     uppercase?: boolean;
@@ -52,28 +37,10 @@ const generate = ({length, allow}: GenerateOption): string => {
     return Array.from({length}, () => characters[crypto.getRandomValues(new Uint32Array(1))[0]! % characters.length]).join("");
 };
 
-const getPasswordStrength = async (password: string): Promise<PasswordStrength> => {
-    const zxcvbn = (await import("zxcvbn")).default;
-    const score = zxcvbn(password).guesses_log10;
-    switch (true) {
-    case score < 6:
-        return PasswordStrength.UNSAFE;
-    case score < 10:
-        return PasswordStrength.WEAK;
-    case score < 14:
-        return PasswordStrength.MEDIUM;
-    case score < 20:
-        return PasswordStrength.STRONG;
-    default:
-        return PasswordStrength.VERY_STRONG;
-    }
-};
-
 const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) => {
     const {t} = useLingui();
     const [overwriteModal, overwriteModalContext] = useModal();
     const [isVisible, setIsVisible] = useState<boolean>(true);
-    const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(PasswordStrength.UNSAFE);
     const [options, setOptions] = useState<GenerateOption>({
         length: 20,
         allow: {
@@ -82,10 +49,6 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
             special: true,
         },
     });
-
-    useEffect(() => {
-        getPasswordStrength(password).then(setPasswordStrength);
-    }, [password]);
 
     const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => setPassword(e.currentTarget.value);
 
@@ -133,25 +96,6 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
         },
     ];
 
-    let PasswordIndicator: React.ReactNode;
-    switch (passwordStrength) {
-    case PasswordStrength.UNSAFE:
-        PasswordIndicator = <Trans>Unsafe</Trans>;
-        break;
-    case PasswordStrength.WEAK:
-        PasswordIndicator = <Trans>Weak</Trans>;
-        break;
-    case PasswordStrength.MEDIUM:
-        PasswordIndicator = <Trans>Medium</Trans>;
-        break;
-    case PasswordStrength.STRONG:
-        PasswordIndicator = <Trans>Strong</Trans>;
-        break;
-    case PasswordStrength.VERY_STRONG:
-        PasswordIndicator = <Trans>Very Strong</Trans>;
-        break;
-    }
-
     return (
         <Flex vertical={true}>
             <Input
@@ -177,9 +121,7 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
             />
             {disabled ? null : (
                 <>
-                    <span style={{color: PASSWORD_STRENGTH_COLORS[passwordStrength]}}>
-                        {PasswordIndicator}
-                    </span>
+                    <PasswordStrengthIndicator password={password}/>
                     <Trans>Length: </Trans>{options.length}
                     <Slider
                         min={5}

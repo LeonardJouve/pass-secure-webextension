@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {Button, Flex, Form, Input, message, Typography} from "antd";
+import React, {useRef, useState} from "react";
+import {Button, Flex, Form, Input, message, Typography, type InputRef} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import type {Rule} from "antd/es/form";
 import {Trans, useLingui} from "@lingui/react/macro";
@@ -7,6 +7,7 @@ import useAuth from "../store/auth";
 import useRouter, {Route} from "../store/router";
 import type {RegisterInput} from "../api/auth";
 import LocalePicker from "./locale_picker";
+import PasswordStrengthIndicator from "./password_strength_indicator";
 
 const Register: React.FC = () => {
     const {t} = useLingui();
@@ -14,6 +15,8 @@ const Register: React.FC = () => {
     const {register} = useAuth();
     const {push} = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [password, setPassword] = useState<string>("");
+    const passwordInputRef = useRef<InputRef>(null);
 
     const handleRegister = async (values: RegisterInput): Promise<void> => {
         setIsLoading(true);
@@ -38,12 +41,19 @@ const Register: React.FC = () => {
         },
     });
 
+    const handleChange = (e: React.FormEvent<HTMLFormElement>): void => {
+        if (e.target === passwordInputRef.current?.input) {
+            setPassword(passwordInputRef.current.input.value);
+        }
+    };
+
     return (
         <Flex>
             <LocalePicker/>
             <Form
                 name="register"
                 onFinish={handleRegister}
+                onChange={handleChange}
             >
                 <Form.Item
                     name="email"
@@ -62,7 +72,9 @@ const Register: React.FC = () => {
                     <Input.Password
                         prefix={<LockOutlined/>}
                         placeholder={t({message: "Password"})}
+                        ref={passwordInputRef}
                     />
+                    <PasswordStrengthIndicator password={password}/>
                 </Form.Item>
                 <Form.Item
                     name="passwordConfirm"
