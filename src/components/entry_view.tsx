@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {Button, Flex, Input, Modal, Select, Tooltip} from "antd";
-import {CheckOutlined, DeleteOutlined, EditOutlined, RollbackOutlined} from "@ant-design/icons";
+import browser from "webextension-polyfill";
+import {Button, Flex, Input, message, Modal, Select, Tooltip} from "antd";
+import {CheckOutlined, CopyOutlined, DeleteOutlined, EditOutlined, GlobalOutlined, RollbackOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
 import {useShallow} from "zustand/shallow";
 import useRouter from "../store/router";
@@ -14,6 +15,7 @@ const EntryView: React.FC = () => {
     const {t} = useLingui();
     const [deleteModal, deleteModalContext] = Modal.useModal();
     const [overwriteModal, overwriteModalContext] = Modal.useModal();
+    const [copyMessage, copyMessageContext] = message.useMessage();
     const {current, pop} = useRouter();
     const {deleteEntry, getEntry, updateEntry} = useEntries();
     const {folders, getFolders} = useFolders();
@@ -100,7 +102,16 @@ const EntryView: React.FC = () => {
                 });
             },
         });
-    }
+    };
+
+    const handleCopyUsername = (): void => {
+        navigator.clipboard.writeText(username);
+        copyMessage.info(<Trans>Username copied !</Trans>);
+    };
+
+    const handleOpen = (): void => {
+        browser.tabs.create({url: entry.url});
+    };
 
     const folderOptions = folders.map(({id, name, parentId}) => ({
         label: parentId === null ? t({message: "<default>"}) : name,
@@ -121,6 +132,13 @@ const EntryView: React.FC = () => {
                 value={username}
                 onChange={handleUsername}
                 disabled={!isEditing}
+                suffix={isEditing ? null : (
+                    <Button
+                        type="dashed"
+                        icon={<CopyOutlined/>}
+                        onClick={handleCopyUsername}
+                    />
+                )}
             />
             <Input
                 type="url"
@@ -128,6 +146,13 @@ const EntryView: React.FC = () => {
                 value={url}
                 onChange={handleUrl}
                 disabled={!isEditing}
+                suffix={isEditing ? null : (
+                    <Button
+                        type="link"
+                        icon={<GlobalOutlined/>}
+                        onClick={handleOpen}
+                    />
+                )}
             />
             <Select
                 options={folderOptions}
@@ -177,6 +202,7 @@ const EntryView: React.FC = () => {
             )}
             {deleteModalContext}
             {overwriteModalContext}
+            {copyMessageContext}
         </Flex>
     );
 };

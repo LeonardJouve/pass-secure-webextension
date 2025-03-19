@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import {Button, Checkbox, Flex, Input, Slider, type CheckboxOptionType} from "antd";
+import {Button, Checkbox, Flex, Input, message, Slider, type CheckboxOptionType} from "antd";
 import {Trans, useLingui} from "@lingui/react/macro";
-import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SyncOutlined} from "@ant-design/icons";
+import {CopyOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, SyncOutlined} from "@ant-design/icons";
 import useModal from "antd/es/modal/useModal";
 import PasswordStrengthIndicator from "./password_strength_indicator";
 
@@ -38,6 +38,7 @@ const generate = ({length, allow}: GenerateOption): string => {
 };
 
 const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) => {
+    const [copyMessage, copyMessageContext] = message.useMessage();
     const {t} = useLingui();
     const [overwriteModal, overwriteModalContext] = useModal();
     const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -81,6 +82,12 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
         }, {}),
     });
 
+
+    const handleCopyPassword = (): void => {
+        navigator.clipboard.writeText(password);
+        copyMessage.info(<Trans>Password copied !</Trans>);
+    };
+
     const checkboxOptions: CheckboxOptionType<AllowKey>[] = [
         {
             label: <Trans>Uppercase</Trans>,
@@ -103,7 +110,13 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
                 value={password}
                 placeholder={t({message: "Password"})}
                 onChange={handleChange}
-                suffix={disabled ? null : (
+                suffix={disabled ? (
+                    <Button
+                        type="dashed"
+                        icon={<CopyOutlined/>}
+                        onClick={handleCopyPassword}
+                    />
+                ) : (
                     <Flex gap="small">
                         <Button
                             icon={isVisible ? <EyeOutlined/> : <EyeInvisibleOutlined/>}
@@ -137,6 +150,7 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
                 </>
             )}
             {overwriteModalContext}
+            {copyMessageContext}
         </Flex>
     );
 };
