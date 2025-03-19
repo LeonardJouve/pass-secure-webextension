@@ -15,7 +15,7 @@ const EntryView: React.FC = () => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
     const [overwriteModal, overwriteModalContext] = Modal.useModal();
     const {current, pop} = useRouter();
-    const {deleteEntry, getEntry} = useEntries();
+    const {deleteEntry, getEntry, updateEntry} = useEntries();
     const {folders, getFolders} = useFolders();
     const [isEditing, setIsEditing] = useState<boolean>(Boolean(current.params["isEditing"]));
     const entryId = Number(current.params["entryId"]);
@@ -89,14 +89,21 @@ const EntryView: React.FC = () => {
             okButtonProps: {type: "primary"},
             cancelText: <Trans>No</Trans>,
             onOk: () => {
-                // TODO
                 setIsEditing(false);
+                updateEntry({
+                    id: entry.id,
+                    name,
+                    username,
+                    password,
+                    url,
+                    folderId,
+                });
             },
         });
     }
 
     const folderOptions = folders.map(({id, name, parentId}) => ({
-        label: parentId === null ? name : t({message: "<default>"}),
+        label: parentId === null ? t({message: "<default>"}) : name,
         value: id,
     }));
 

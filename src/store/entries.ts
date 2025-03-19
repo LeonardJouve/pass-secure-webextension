@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import type {OkResponse, Response} from "../api/api";
-import type {Entry, GetEntriesResponse, GetEntryResponse} from "../api/entries";
+import type {Entry, GetEntriesResponse, GetEntryResponse, UpdateEntryResponse} from "../api/entries";
 import EntriesApi, {type GetEntriesInput} from "../api/entries";
 import type {Folder} from "../api/folders";
 
@@ -9,6 +9,7 @@ type EntriesStore = {
     getEntries: (input?: GetEntriesInput) => Response<GetEntriesResponse>;
     deleteEntry: (entryId: Entry["id"]) => Response<OkResponse>;
     getEntry: (entryId: Entry["id"]) => Response<GetEntryResponse>;
+    updateEntry: (entry: Entry) => Response<UpdateEntryResponse>;
 };
 
 const useEntries = create<EntriesStore>((set, get) => ({
@@ -29,14 +30,32 @@ const useEntries = create<EntriesStore>((set, get) => ({
 
         return response;
     },
-    getEntry: async (entryId: Entry["id"]): Response<GetEntryResponse> => {
+    getEntry: async (entryId): Response<GetEntryResponse> => {
         const response = await EntriesApi.getEntry(entryId);
-        if (!response.error && !get().entries.some(({id}) => id === entryId)) {
-            set(({entries}) => ({entries: [...entries, response.data]}))
+        if (!response.error) {
+            set(({entries}) => ({entries: entries.find(({id}) => id === response.data.id) ? entries.map((entry) => {
+                if (entry.id === response.data.id) {
+                    return response.data;
+                }
+                return entry;
+            }) : [...entries, response.data]}));
         }
 
         return response;
-    }
+    },
+    updateEntry: async (entry): Response<UpdateEntryResponse> => {
+        const response = await EntriesApi.updateEntry(entry);
+        if (!response.error) {
+            set(({entries}) => ({entries: entries.find(({id}) => id === response.data.id) ? entries.map((entry) => {
+                if (entry.id === response.data.id) {
+                    return response.data;
+                }
+                return entry;
+            }) : [...entries, response.data]}));
+        }
+
+        return response;
+    },
 }));
 
 export const getFolderEntries = (folderId: Folder["id"]): (state: EntriesStore) => Entry[] => (state) => state.entries.filter((entry) => entry.folderId === folderId);
