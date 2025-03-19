@@ -13,6 +13,7 @@ import useFolders from "../store/folders";
 const EntryView: React.FC = () => {
     const {t} = useLingui();
     const [deleteModal, deleteModalContext] = Modal.useModal();
+    const [overwriteModal, overwriteModalContext] = Modal.useModal();
     const {current, pop} = useRouter();
     const {deleteEntry, getEntry} = useEntries();
     const {folders, getFolders} = useFolders();
@@ -79,12 +80,23 @@ const EntryView: React.FC = () => {
     const handleEdit = (): void => setIsEditing(!isEditing);
 
     const handleSave = (): void => {
-        // TODO
-        setIsEditing(false);
+        overwriteModal.confirm({
+            title: <Trans>Overwrite</Trans>,
+            icon: <EditOutlined/>,
+            content: <Trans>Are you sure you want to <strong>Overwrite</strong> current entry</Trans>,
+            okText: <Trans>Ok</Trans>,
+            okType: "danger",
+            okButtonProps: {type: "primary"},
+            cancelText: <Trans>No</Trans>,
+            onOk: () => {
+                // TODO
+                setIsEditing(false);
+            },
+        });
     }
 
-    const folderOptions = folders.map(({id, name}) => ({
-        label: name.length ? name : t({message: "<default>"}),
+    const folderOptions = folders.map(({id, name, parentId}) => ({
+        label: parentId === null ? name : t({message: "<default>"}),
         value: id,
     }));
 
@@ -157,6 +169,7 @@ const EntryView: React.FC = () => {
                 </Tooltip>
             )}
             {deleteModalContext}
+            {overwriteModalContext}
         </Flex>
     );
 };
