@@ -46,7 +46,7 @@ const EntryView: React.FC = () => {
             setUrl(entry.url);
             setFolderId(entry.folderId);
         }
-    }, [entry, entryId]);
+    }, [entry, current]);
 
     useEffect(() => {
         if (!folders) {

@@ -16,8 +16,11 @@ export type GetFoldersInput = {
 
 export type GetFoldersResponse = Folder[];
 
+export type GetFolderResponse = Folder;
+
 class FoldersApi {
     static getFolders = async (input?: GetFoldersInput): Response<GetFoldersResponse> => await Api.fetch<GetFoldersResponse>("/folders", {method: "GET", body: input ? JSON.stringify(input) : undefined});
+    static getFolder = async (folderId: Folder["id"]): Response<GetFolderResponse> => await Api.fetch<GetFolderResponse>(`/folders/${folderId}`, {method: "GET"});
 };
 
 export default FoldersApi;

@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import type {OkResponse, Response} from "../api/api";
-import type {Entry, GetEntriesResponse, GetEntryResponse, UpdateEntryResponse} from "../api/entries";
+import type {CreateEntryResponse, Entry, GetEntriesResponse, GetEntryResponse, UpdateEntryResponse} from "../api/entries";
 import EntriesApi, {type GetEntriesInput} from "../api/entries";
 import type {Folder} from "../api/folders";
 
@@ -10,9 +10,10 @@ type EntriesStore = {
     deleteEntry: (entryId: Entry["id"]) => Response<OkResponse>;
     getEntry: (entryId: Entry["id"]) => Response<GetEntryResponse>;
     updateEntry: (entry: Entry) => Response<UpdateEntryResponse>;
+    createEntry: (entry: Omit<Entry, "id">) => Response<CreateEntryResponse>;
 };
 
-const useEntries = create<EntriesStore>((set, get) => ({
+const useEntries = create<EntriesStore>((set) => ({
     entries: [],
     getEntries: async (input): Response<GetEntriesResponse> => {
         const response = await EntriesApi.getEntries(input);
@@ -56,6 +57,19 @@ const useEntries = create<EntriesStore>((set, get) => ({
 
         return response;
     },
+    createEntry: async (entry): Response<CreateEntryResponse> => {
+        const response = await EntriesApi.createEntry(entry);
+        if (!response.error) {
+            set(({entries}) => ({entries: entries.find(({id}) => id === response.data.id) ? entries.map((entry) => {
+                if (entry.id === response.data.id) {
+                    return response.data;
+                }
+                return entry;
+            }) : [...entries, response.data]}));
+        }
+
+        return response;
+    }
 }));
 
 export const getFolderEntries = (folderId: Folder["id"]): (state: EntriesStore) => Entry[] => (state) => state.entries.filter((entry) => entry.folderId === folderId);

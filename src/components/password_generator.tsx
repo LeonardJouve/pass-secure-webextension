@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {Button, Checkbox, Flex, Input, message, Slider, type CheckboxOptionType} from "antd";
+import React, {forwardRef, useState} from "react";
+import {Button, Checkbox, Flex, Input, message, Slider, type CheckboxOptionType, type InputRef} from "antd";
 import {Trans, useLingui} from "@lingui/react/macro";
 import {CopyOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, SyncOutlined} from "@ant-design/icons";
 import useModal from "antd/es/modal/useModal";
@@ -21,7 +21,7 @@ type GenerateOption = {
 type Props = {
     password: string;
     setPassword: (password: string) => void;
-    disabled: boolean;
+    disabled?: boolean;
 };
 
 const generate = ({length, allow}: GenerateOption): string => {
@@ -37,7 +37,7 @@ const generate = ({length, allow}: GenerateOption): string => {
     return Array.from({length}, () => characters[crypto.getRandomValues(new Uint32Array(1))[0]! % characters.length]).join("");
 };
 
-const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) => {
+const PasswordGenerator = forwardRef<InputRef, Props>(({password, setPassword, disabled}, ref) => {
     const [copyMessage, copyMessageContext] = message.useMessage();
     const {t} = useLingui();
     const [overwriteModal, overwriteModalContext] = useModal();
@@ -106,6 +106,7 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
     return (
         <Flex vertical={true}>
             <Input
+                ref={ref}
                 type={isVisible ? "text" : "password"}
                 value={password}
                 placeholder={t({message: "Password"})}
@@ -153,6 +154,6 @@ const PasswordGenerator: React.FC<Props> = ({password, setPassword, disabled}) =
             {copyMessageContext}
         </Flex>
     );
-};
+});
 
 export default PasswordGenerator;

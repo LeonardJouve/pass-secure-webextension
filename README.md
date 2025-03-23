@@ -1,7 +1,8 @@
 TODO:
 - Virtualize folder collapse entries list
 - Theme
-- One time share (with / without password)
 - Edit folder
+- One time share (with / without password)
 - Share folder
-- Edit entry (!isEditing options)
+- Websocket sync
+- React query
