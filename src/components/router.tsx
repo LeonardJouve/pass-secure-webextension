@@ -6,9 +6,10 @@ import useAuth, {Status} from "../store/auth";
 import App from "./app";
 import EditProfile from "./edit_profile";
 import CreateEntry from "./create_entry";
-import UpsertFolder from "./upsert_folder";
 import EntryView from "./entry_view";
 import Unlock from "./unlock";
+import CreateFolder from "./create_folder";
+import EditFolder from "./edit_folder";
 
 const COMPONENTS: Record<Status, Partial<Record<Route, React.FC>>> = {
     [Status.DISCONNECTED]: {
@@ -21,7 +22,8 @@ const COMPONENTS: Record<Status, Partial<Record<Route, React.FC>>> = {
     [Status.CONNECTED]: {
         [Route.MAIN]: App,
         [Route.EDIT_PROFILE]: EditProfile,
-        [Route.UPSERT_FOLDER]: UpsertFolder,
+        [Route.CREATE_FOLDER]: CreateFolder,
+        [Route.EDIT_FOLDER]: EditFolder,
         [Route.CREATE_ENTRY]: CreateEntry,
         [Route.ENTRY_VIEW]: EntryView,
     },

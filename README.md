@@ -1,5 +1,4 @@
 TODO:
-- Edit folder
 - Remove folder
 - Split entry view
 - Use Form for entry view

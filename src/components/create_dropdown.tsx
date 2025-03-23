@@ -18,7 +18,7 @@ const CreateDropdown: React.FC<Props> = ({folderId}) => {
                 key: 1,
                 label: <Trans>Create Folder</Trans>,
                 icon: <FolderAddOutlined/>,
-                onClick: (): void => push(Route.UPSERT_FOLDER, {parentId: folderId}),
+                onClick: (): void => push(Route.CREATE_FOLDER, {parentId: folderId}),
             },
             {
                 key: 2,
