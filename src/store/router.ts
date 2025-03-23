@@ -7,6 +7,7 @@ export enum Route {
     EDIT_PROFILE,
     CREATE_FOLDER,
     CREATE_ENTRY,
+    EDIT_FOLDER,
     ENTRY_VIEW,
     UNLOCK,
 }

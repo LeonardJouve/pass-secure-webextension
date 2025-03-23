@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {useShallow} from "zustand/react/shallow";
-import {Avatar, Collapse, Flex, List, type CollapseProps} from "antd";
-import {FolderOpenOutlined} from "@ant-design/icons";
+import {Avatar, Button, Collapse, Flex, List, Tooltip, type CollapseProps} from "antd";
+import {EditOutlined, FolderOpenOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import type {Folder} from "../api/folders";
 import useFolders, {getChildrenFolders} from "../store/folders";
@@ -11,6 +11,7 @@ import type {Entry} from "../api/entries";
 import ListEntry from "./list_entry";
 import UserAvatar from "./user_avatar";
 import useUsers from "../store/users";
+import useRouter, {Route} from "../store/router";
 
 type Props = {
     folderId: Folder["id"];
@@ -21,6 +22,7 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
     const folderEntries = useEntries(useShallow(getFolderEntries(folderId)));
     const {getEntries} = useEntries();
     const {me} = useUsers();
+    const {push} = useRouter();
 
     useEffect(() => {
         if (!folderEntries.length) {
@@ -29,6 +31,11 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
     }, [folderEntries]);
 
     const folderItems: CollapseProps["items"] = childrenFolders.map((childFolder, i) => {
+        const handleEdit: React.MouseEventHandler = (e): void => {
+            e.stopPropagation();
+            push(Route.EDIT_FOLDER, {folderId: childFolder.id});
+        };
+
         const avatars: React.ReactNode[] = childFolder.userIds
             .filter((userId) => userId !== me?.id)
             .map((userId) => <UserAvatar userId={userId}/>);
@@ -45,6 +52,13 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
                                 {avatars}
                             </Avatar.Group>
                         ) : null}
+                        <Tooltip title={<Trans>Edit</Trans>}>
+                            <Button
+                                type="link"
+                                icon={<EditOutlined/>}
+                                onClick={handleEdit}
+                            />
+                        </Tooltip>
                         <CreateDropdown folderId={childFolder.id}/>
                     </Flex>
                 </Flex>

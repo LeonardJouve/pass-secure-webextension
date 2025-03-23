@@ -9,6 +9,7 @@ import CreateEntry from "./create_entry";
 import CreateFolder from "./create_folder";
 import EntryView from "./entry_view";
 import Unlock from "./unlock";
+import EditFolder from "./edit_folder";
 
 const COMPONENTS: Record<Status, Partial<Record<Route, React.FC>>> = {
     [Status.DISCONNECTED]: {
@@ -23,6 +24,7 @@ const COMPONENTS: Record<Status, Partial<Record<Route, React.FC>>> = {
         [Route.EDIT_PROFILE]: EditProfile,
         [Route.CREATE_FOLDER]: CreateFolder,
         [Route.CREATE_ENTRY]: CreateEntry,
+        [Route.EDIT_FOLDER]: EditFolder,
         [Route.ENTRY_VIEW]: EntryView,
     },
 };

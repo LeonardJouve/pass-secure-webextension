@@ -24,12 +24,12 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         getActiveTabURL().then((active) => setIsCurrentTabEntry(active !== null && active === entry.url), () => setIsCurrentTabEntry(false));
     }, [entry]);
 
-    const handleFill: React.MouseEventHandler<HTMLElement> = (e): void => {
+    const handleFill: React.MouseEventHandler = (e): void => {
         e.stopPropagation();
         console.log("TODO");
     };
 
-    const handleOpen: React.MouseEventHandler<HTMLElement> = (e): void => {
+    const handleOpen: React.MouseEventHandler = (e): void => {
         e.stopPropagation();
 
         if (!entry.url) {
@@ -39,7 +39,7 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         browser.tabs.create({url: entry.url});
     };
 
-    const handleEdit: React.MouseEventHandler<HTMLElement> = (e): void => {
+    const handleEdit: React.MouseEventHandler = (e): void => {
         e.stopPropagation();
         push(Route.ENTRY_VIEW, {isEditing: true, entryId: entry.id});
     };
