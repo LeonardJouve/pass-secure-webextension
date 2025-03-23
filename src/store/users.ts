@@ -1,13 +1,14 @@
 import {create} from "zustand";
 import type {Response} from "../api/api";
 import UsersApi from "../api/users";
-import type {GetMeResponse, GetUserResponse, User} from "../api/users";
+import type {GetMeResponse, GetUserResponse, GetUsersResponse, User} from "../api/users";
 
 type UsersStore = {
     me: User|null;
     users: User[];
     getMe: () => Response<GetMeResponse>;
     getUser: (userId: User["id"]) => Response<GetUserResponse>;
+    getUsers: () => Response<GetUsersResponse>;
 };
 
 const useUsers = create<UsersStore>((set) => ({
@@ -34,6 +35,14 @@ const useUsers = create<UsersStore>((set) => ({
                 ...users,
                 response.data,
             ]}));
+        }
+
+        return response;
+    },
+    getUsers: async (): Response<GetUsersResponse> => {
+        const response = await UsersApi.getUsers();
+        if (!response.error) {
+            set({users: response.data});
         }
 
         return response;

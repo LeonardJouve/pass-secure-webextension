@@ -1,12 +1,13 @@
 import {create} from "zustand";
 import type {Response} from "../api/api";
-import type {Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse} from "../api/folders";
+import type {CreateFolderResponse, Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse} from "../api/folders";
 import FoldersApi from "../api/folders";
 
 type FoldersStore = {
     folders: Folder[];
     getFolders: (input?: GetFoldersInput) => Response<GetFoldersResponse>;
     getFolder: (folderId: Folder["id"]) => Response<GetFolderResponse>;
+    createFolder: (folder: Omit<Folder, "id"|"ownerId">) => Response<CreateFolderResponse>;
 };
 
 const useFolders = create<FoldersStore>((set) => ({
@@ -31,7 +32,20 @@ const useFolders = create<FoldersStore>((set) => ({
         }
 
         return response;
-    }
+    },
+    createFolder: async (folder): Response<CreateFolderResponse> => {
+        const response = await FoldersApi.createFolder(folder);
+        if (!response.error) {
+            set(({folders}) => ({folders: folders.find(({id}) => id === response.data.id) ? folders.map((folder) => {
+                if (folder.id === response.data.id) {
+                    return response.data;
+                }
+                return folder;
+            }) : [...folders, response.data]}));
+        }
+
+        return response;
+    },
 }));
 
 export const getChildrenFolders = (folderId: Folder["id"]): (state: FoldersStore) => Folder[] => (state) => state.folders.filter(({parentId}) => parentId === folderId);

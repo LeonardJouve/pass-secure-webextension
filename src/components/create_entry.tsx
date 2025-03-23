@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Button, Flex, Form, Input, Select, Tooltip} from "antd";
 import {CheckOutlined, RollbackOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
-import useRouter from "../store/router";
+import useRouter, {Route} from "../store/router";
 import useFolders from "../store/folders";
 import useEntries from "../store/entries";
 import type {Entry} from "../api/entries";
@@ -11,12 +11,11 @@ import PasswordGenerator from "./password_generator";
 
 const CreateEntry: React.FC = () => {
     const {t} = useLingui();
-    const form = Form.useFormInstance();
-    const {current, pop} = useRouter();
-    const folderId = Number(current.params["folderId"]);
+    const {current, pop, replace} = useRouter();
     const {folders, getFolders} = useFolders();
     const {createEntry} = useEntries();
     const [password, setPassword] = useState<string>("");
+    const folderId = Number(current.params["folderId"]);
 
     useEffect(() => {
         if (!folderId) {
@@ -30,9 +29,11 @@ const CreateEntry: React.FC = () => {
         }
     }, [folders]);
 
-    const handleSave = (values: Omit<Entry, "id">): void => {
-        console.log(values);
-        createEntry(values);
+    const handleSave = async (values: Omit<Entry, "id">): Promise<void> => {
+        const response = await createEntry(values);
+        if (!response.error) {
+            replace(Route.ENTRY_VIEW, {entryId: response.data.id, isEditing: false});
+        }
     };
 
     const handleCancel = (): void => pop();
@@ -47,7 +48,6 @@ const CreateEntry: React.FC = () => {
             <RouterBack/>
             <Form
                 name="createEntry"
-                form={form}
                 onFinish={handleSave}
                 initialValues={{folder: folderId}}
             >

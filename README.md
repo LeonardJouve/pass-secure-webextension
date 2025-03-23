@@ -1,8 +1,11 @@
 TODO:
+- Split entry view
+- Use Form for entry view
+- Edit folder
 - Virtualize folder collapse entries list
 - Theme
-- Edit folder
-- One time share (with / without password)
-- Share folder
+- One time password share (with / without password)
+- Folder share
 - Websocket sync
 - React query
+- Fix eslint
