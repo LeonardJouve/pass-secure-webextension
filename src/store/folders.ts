@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import type {Response} from "../api/api";
-import type {CreateFolderResponse, Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse} from "../api/folders";
+import type {CreateFolderResponse, Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse, UpdateFolderResponse} from "../api/folders";
 import FoldersApi from "../api/folders";
 
 type FoldersStore = {
@@ -8,6 +8,7 @@ type FoldersStore = {
     getFolders: (input?: GetFoldersInput) => Response<GetFoldersResponse>;
     getFolder: (folderId: Folder["id"]) => Response<GetFolderResponse>;
     createFolder: (folder: Omit<Folder, "id"|"ownerId">) => Response<CreateFolderResponse>;
+    updateFolder: (folder: Omit<Folder, "ownerId">) => Response<UpdateFolderResponse>;
 };
 
 const useFolders = create<FoldersStore>((set) => ({
@@ -35,6 +36,19 @@ const useFolders = create<FoldersStore>((set) => ({
     },
     createFolder: async (folder): Response<CreateFolderResponse> => {
         const response = await FoldersApi.createFolder(folder);
+        if (!response.error) {
+            set(({folders}) => ({folders: folders.find(({id}) => id === response.data.id) ? folders.map((folder) => {
+                if (folder.id === response.data.id) {
+                    return response.data;
+                }
+                return folder;
+            }) : [...folders, response.data]}));
+        }
+
+        return response;
+    },
+    updateFolder: async (folder): Response<UpdateFolderResponse> => {
+        const response = await FoldersApi.updateFolder(folder);
         if (!response.error) {
             set(({folders}) => ({folders: folders.find(({id}) => id === response.data.id) ? folders.map((folder) => {
                 if (folder.id === response.data.id) {

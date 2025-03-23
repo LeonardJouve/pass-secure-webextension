@@ -5,9 +5,8 @@ export enum Route {
     REGISTER,
     MAIN,
     EDIT_PROFILE,
-    CREATE_FOLDER,
+    UPSERT_FOLDER,
     CREATE_ENTRY,
-    EDIT_FOLDER,
     ENTRY_VIEW,
     UNLOCK,
 }

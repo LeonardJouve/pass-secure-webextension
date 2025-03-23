@@ -33,7 +33,7 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
     const folderItems: CollapseProps["items"] = childrenFolders.map((childFolder, i) => {
         const handleEdit: React.MouseEventHandler = (e): void => {
             e.stopPropagation();
-            push(Route.EDIT_FOLDER, {folderId: childFolder.id});
+            push(Route.UPSERT_FOLDER, {folderId: childFolder.id});
         };
 
         const avatars: React.ReactNode[] = childFolder.userIds
