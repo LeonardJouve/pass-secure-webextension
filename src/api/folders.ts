@@ -1,5 +1,5 @@
 import type {User} from "./users";
-import type {Response} from "./api";
+import type {OkResponse, Response} from "./api";
 import Api from "./api";
 
 export type Folder = {
@@ -27,6 +27,7 @@ class FoldersApi {
     static getFolder = async (folderId: Folder["id"]): Response<GetFolderResponse> => await Api.fetch<GetFolderResponse>(`/folders/${folderId}`, {method: "GET"});
     static createFolder = async (folder: Omit<Folder, "id"|"ownerId">): Response<CreateFolderResponse> => await Api.fetch<CreateFolderResponse>("/folders", {method: "POST", body: JSON.stringify(folder)});
     static updateFolder = async ({id, ...props}: Omit<Folder, "ownerId">): Response<UpdateFolderResponse> => await Api.fetch(`/folders${id}`, {method: "PUT", body: JSON.stringify(props)})
+    static deleteFolder = async (id: Folder["id"]): Response<OkResponse> => await Api.fetch(`/folders/${id}`, {method: "DELETE"});
 };
 
 export default FoldersApi;

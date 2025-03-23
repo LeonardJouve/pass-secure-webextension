@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import type {Response} from "../api/api";
+import type {OkResponse, Response} from "../api/api";
 import type {CreateFolderResponse, Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse, UpdateFolderResponse} from "../api/folders";
 import FoldersApi from "../api/folders";
 
@@ -9,6 +9,7 @@ type FoldersStore = {
     getFolder: (folderId: Folder["id"]) => Response<GetFolderResponse>;
     createFolder: (folder: Omit<Folder, "id"|"ownerId">) => Response<CreateFolderResponse>;
     updateFolder: (folder: Omit<Folder, "ownerId">) => Response<UpdateFolderResponse>;
+    deleteFolder: (folderId: Folder["id"]) => Response<OkResponse>;
 };
 
 const useFolders = create<FoldersStore>((set) => ({
@@ -56,6 +57,14 @@ const useFolders = create<FoldersStore>((set) => ({
                 }
                 return folder;
             }) : [...folders, response.data]}));
+        }
+
+        return response;
+    },
+    deleteFolder: async (folderId): Response<OkResponse> => {
+        const response = await FoldersApi.deleteFolder(folderId);
+        if (!response.error) {
+            set(({folders}) => ({folders: folders.filter(({id}) => id !== folderId)}));
         }
 
         return response;
