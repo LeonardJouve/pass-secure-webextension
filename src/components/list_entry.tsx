@@ -24,14 +24,9 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         getActiveTabURL().then((active) => setIsCurrentTabEntry(active !== null && active === entry.url), () => setIsCurrentTabEntry(false));
     }, [entry]);
 
-    const handleFill: React.MouseEventHandler = (e): void => {
-        e.stopPropagation();
-        console.log("TODO");
-    };
+    const handleFill = (): void => console.log("TODO");
 
-    const handleOpen: React.MouseEventHandler = (e): void => {
-        e.stopPropagation();
-
+    const handleOpen = (): void => {
         if (!entry.url) {
             return;
         }
@@ -39,12 +34,7 @@ const ListEntry: React.FC<Props> = ({entry}) => {
         browser.tabs.create({url: entry.url});
     };
 
-    const handleEdit: React.MouseEventHandler = (e): void => {
-        e.stopPropagation();
-        push(Route.ENTRY_VIEW, {isEditing: true, entryId: entry.id});
-    };
-
-    const handlePreview = (): void => push(Route.ENTRY_VIEW, {isEditing: false, entryId: entry.id});
+    const handleEdit = (): void => push(Route.EDIT_ENTRY, {entryId: entry.id});
 
     const handleCopyUsername = (): void => {
         navigator.clipboard.writeText(entry.username);
@@ -65,25 +55,23 @@ const ListEntry: React.FC<Props> = ({entry}) => {
             />
         </Tooltip>
     ), (
-        <div onClick={(e) => e.stopPropagation()}>
-            <Dropdown menu={{items: [
-                {
-                    key: 1,
-                    label: <Trans>Copy Username</Trans>,
-                    onClick: handleCopyUsername,
-                },
-                {
-                    key: 2,
-                    label: <Trans>Copy Password</Trans>,
-                    onClick: handleCopyPassword,
-                },
-            ]}}>
-                <Button
-                    type="dashed"
-                    icon={<CopyOutlined/>}
-                />
-            </Dropdown>
-        </div>
+        <Dropdown menu={{items: [
+            {
+                key: 1,
+                label: <Trans>Copy Username</Trans>,
+                onClick: handleCopyUsername,
+            },
+            {
+                key: 2,
+                label: <Trans>Copy Password</Trans>,
+                onClick: handleCopyPassword,
+            },
+        ]}}>
+            <Button
+                type="dashed"
+                icon={<CopyOutlined/>}
+            />
+        </Dropdown>
     )];
 
     if (entry.url) {
@@ -110,17 +98,13 @@ const ListEntry: React.FC<Props> = ({entry}) => {
     }
 
     return (
-        <>
-            <List.Item
-                onClick={handlePreview}
-                title={entry.name}
-                actions={actions.reverse()}
-                style={{cursor: "pointer"}}
-            >
-                <List.Item.Meta title={entry.name}/>
-            </List.Item>
+        <List.Item
+            title={entry.name}
+            actions={actions.reverse()}
+        >
+            <List.Item.Meta title={entry.name}/>
             {copyMessageContext}
-        </>
+        </List.Item>
     );
 };
 

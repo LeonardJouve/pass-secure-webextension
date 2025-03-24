@@ -14,15 +14,7 @@ type EntriesStore = {
 };
 
 const useEntries = create<EntriesStore>((set) => ({
-    entries: [
-        {
-            id: 1,
-            name: "test",
-            username: "username",
-            password: "password",
-            folderId: 1,
-        },
-    ],
+    entries: [],
     getEntries: async (input): Response<GetEntriesResponse> => {
         const response = await EntriesApi.getEntries(input);
         if (!response.error) {

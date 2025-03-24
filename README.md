@@ -1,12 +1,11 @@
 Translations are made using [TranslationIO](https://translation.io)
 
 TODO:
-- Split entry view
-- Use Form for entry view
+- Edit / delete user
+- Folder invite
 - React query
 - Fix eslint
 - Theme
 - Virtualize folder collapse entries list
 - One time password share (with / without password)
-- Folder share
 - Websocket sync
