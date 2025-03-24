@@ -18,7 +18,7 @@ type AuthStore = {
 };
 
 const useAuth = create<AuthStore>((set) => ({
-    status: Status.DISCONNECTED,
+    status: Status.CONNECTED,
     register: AuthApi.register,
     login: async (input): Response<LoginResponse> => {
         const response = await AuthApi.login(input);

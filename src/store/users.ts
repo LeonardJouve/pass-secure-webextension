@@ -13,7 +13,13 @@ type UsersStore = {
 
 const useUsers = create<UsersStore>((set) => ({
     me: null,
-    users: [],
+    users: [
+        {
+            id: 1,
+            username: "username",
+            email: "test@test.test",
+        },
+    ],
     getMe: async (): Response<GetMeResponse> => {
         const response = await UsersApi.getMe();
         if (!response.error) {

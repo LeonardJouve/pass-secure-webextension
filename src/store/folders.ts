@@ -13,7 +13,15 @@ type FoldersStore = {
 };
 
 const useFolders = create<FoldersStore>((set) => ({
-    folders: [],
+    folders: [
+        {
+            id: 1,
+            name: "",
+            ownerId: 1,
+            userIds: [1],
+            parentId: null,
+        },
+    ],
     getFolders: async (input): Response<GetFoldersResponse> => {
         const response = await FoldersApi.getFolders(input);
         if (!response.error) {
