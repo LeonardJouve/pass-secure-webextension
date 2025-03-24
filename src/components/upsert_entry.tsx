@@ -20,7 +20,7 @@ type Props = {
 const UpsertEntry: React.FC<Props> = ({folderId, entry}) => {
     const {t} = useLingui();
     const [deleteModal, deleteModalContext] = Modal.useModal();
-    const {pop, replace} = useRouter();
+    const {pop} = useRouter();
     const {folders, getFolders} = useFolders();
     const {createEntry, updateEntry, deleteEntry} = useEntries();
     const [password, setPassword] = useState<string>(entry?.password ?? "");
@@ -38,7 +38,7 @@ const UpsertEntry: React.FC<Props> = ({folderId, entry}) => {
         }) : await createEntry(values);
 
         if (!response.error) {
-            replace(Route.MAIN);
+            pop();
         }
     };
 

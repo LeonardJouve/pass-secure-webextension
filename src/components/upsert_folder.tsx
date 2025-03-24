@@ -18,7 +18,7 @@ type Props = {
 
 const UpsertFolder: React.FC<Props> = ({parentId, folder}) => {
     const {t} = useLingui();
-    const {pop, replace} = useRouter();
+    const {pop} = useRouter();
     const {folders, getFolders, createFolder, updateFolder} = useFolders();
     const {me, users, getUsers} = useUsers();
 
@@ -41,7 +41,7 @@ const UpsertFolder: React.FC<Props> = ({parentId, folder}) => {
         }) : await createFolder(values);
 
         if (!response.error) {
-            replace(Route.MAIN);
+            pop();
         }
     };
 
