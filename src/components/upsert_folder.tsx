@@ -2,24 +2,21 @@ import React, {useEffect} from "react";
 import {Flex, Form, Input, Tooltip, Button, Select} from "antd";
 import {RollbackOutlined, CheckOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
-import useRouter, {Route} from "../store/router";
+import useRouter from "../store/router";
 import useUsers from "../store/users";
 import useFolders from "../store/folders";
 import RouterBack from "./router_back";
 import type {Folder} from "../api/folders";
 
 type Props = {
-    parentId: Number;
-    folder?: never;
-} | {
-    folder: Folder;
-    parentId?: never;
+    folder: Partial<Folder>;
+    onFinish: (values: Omit<Folder, "id"|"ownerId">) => void;
 }
 
-const UpsertFolder: React.FC<Props> = ({parentId, folder}) => {
+const UpsertFolder: React.FC<Props> = ({folder, onFinish}) => {
     const {t} = useLingui();
     const {pop} = useRouter();
-    const {folders, getFolders, createFolder, updateFolder} = useFolders();
+    const {folders, getFolders} = useFolders();
     const {me, users, getUsers} = useUsers();
 
     useEffect(() => {
@@ -34,22 +31,11 @@ const UpsertFolder: React.FC<Props> = ({parentId, folder}) => {
         }
     }, [users]);
 
-    const handleSave = async (values: Omit<Folder, "id"|"ownerId">): Promise<void> => {
-        const response = folder ? await updateFolder({
-            ...values,
-            id: folder.id,
-        }) : await createFolder(values);
-
-        if (!response.error) {
-            pop();
-        }
-    };
-
     const handleCancel = (): void => pop();
 
-    const parentOptions = folders.map((folder) => ({
-        label: folder.parentId === null ? t({message: "<default>"}) : folder.name,
-        value: folder.id,
+    const parentOptions = folders.map((f) => ({
+        label: f.parentId === null ? t({message: "<default>"}) : f.name,
+        value: f.id,
     }));
 
     const userOptions = users
@@ -64,12 +50,8 @@ const UpsertFolder: React.FC<Props> = ({parentId, folder}) => {
             <RouterBack/>
             <Form
                 name="upsertFolder"
-                onFinish={handleSave}
-                initialValues={{
-                    name: folder?.name,
-                    parent: folder?.parentId ?? parentId,
-                    users: folder?.userIds.filter((userId) => userId !== me?.id) ?? [],
-                }}
+                onFinish={onFinish}
+                initialValues={folder}
             >
                 <Form.Item
                     name="name"
@@ -78,12 +60,12 @@ const UpsertFolder: React.FC<Props> = ({parentId, folder}) => {
                     <Input placeholder={t({message: "Name"})}/>
                 </Form.Item>
                 <Form.Item
-                    name="parent"
+                    name="parentId"
                     rules={[{required: true, message: t({message: "Select folder Parent"})}]}
                 >
                     <Select options={parentOptions}/>
                 </Form.Item>
-                <Form.Item name="users">
+                <Form.Item name="userIds">
                     <Select
                         mode="multiple"
                         optionFilterProp="label"

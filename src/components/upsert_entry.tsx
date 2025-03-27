@@ -1,28 +1,23 @@
 import React, {useEffect, useState} from "react";
-import {Button, Flex, Form, Input, Modal, Select, Tooltip} from "antd";
-import {CheckOutlined, DeleteOutlined, RollbackOutlined} from "@ant-design/icons";
+import {Button, Flex, Form, Input, Select, Tooltip} from "antd";
+import {CheckOutlined, RollbackOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
-import useRouter, {Route} from "../store/router";
+import useRouter from "../store/router";
 import useFolders from "../store/folders";
-import useEntries from "../store/entries";
 import type {Entry} from "../api/entries";
 import RouterBack from "./router_back";
 import PasswordGenerator from "./password_generator";
 
 type Props = {
-    folderId: number;
-    entry?: never;
-} | {
-    entry: Entry;
-    folderId?: never;
+    entry: Partial<Entry>;
+    onFinish: (values: Omit<Entry, "id">) => void;
+    actions?: React.ReactNode;
 };
 
-const UpsertEntry: React.FC<Props> = ({folderId, entry}) => {
+const UpsertEntry: React.FC<Props> = ({entry, onFinish, actions = null}) => {
     const {t} = useLingui();
-    const [deleteModal, deleteModalContext] = Modal.useModal();
     const {pop} = useRouter();
     const {folders, getFolders} = useFolders();
-    const {createEntry, updateEntry, deleteEntry} = useEntries();
     const [password, setPassword] = useState<string>(entry?.password ?? "");
 
     useEffect(() => {
@@ -31,37 +26,7 @@ const UpsertEntry: React.FC<Props> = ({folderId, entry}) => {
         }
     }, [folders]);
 
-    const handleSave = async (values: Omit<Entry, "id">): Promise<void> => {
-        const response = entry ? await updateEntry({
-            ...values,
-            id: entry.id
-        }) : await createEntry(values);
-
-        if (!response.error) {
-            pop();
-        }
-    };
-
     const handleCancel = (): void => pop();
-
-    const handleDelete = (): void => {
-        if (!entry) {
-            return;
-        }
-
-        deleteModal.confirm({
-            title: <Trans>Delete Entry</Trans>,
-            icon: <DeleteOutlined/>,
-            content: <Trans>Are you sure you want to <strong>Delete permanently</strong> this Entry</Trans>,
-            okText: <Trans>Ok</Trans>,
-            cancelText: <Trans>No</Trans>,
-            okType: "danger",
-            okButtonProps: {type: "primary"},
-            onOk: () => {
-                deleteEntry(entry.id);
-            },
-        });
-    };
 
     const folderOptions = folders.map(({id, name, parentId}) => ({
         label: parentId === null ? t({message: "<default>"}) : name,
@@ -73,14 +38,8 @@ const UpsertEntry: React.FC<Props> = ({folderId, entry}) => {
             <RouterBack/>
             <Form
                 name="upsertEntry"
-                onFinish={handleSave}
-                initialValues={{
-                    name: entry?.name,
-                    username: entry?.username,
-                    password: entry?.password,
-                    url: entry?.url,
-                    folder: entry?.folderId ?? folderId,
-                }}
+                onFinish={onFinish}
+                initialValues={entry}
             >
                 <Form.Item
                     name="name"
@@ -113,22 +72,13 @@ const UpsertEntry: React.FC<Props> = ({folderId, entry}) => {
                     />
                 </Form.Item>
                 <Form.Item
-                    name="folder"
+                    name="folderId"
                     rules={[{required: true, message: t({message: "Select entry Folder"})}]}
                 >
                     <Select options={folderOptions}/>
                 </Form.Item>
                 <Flex justify="right" gap="small">
-                    {entry ? (
-                        <Tooltip title={<Trans>Delete</Trans>}>
-                            <Button
-                                danger={true}
-                                type="primary"
-                                icon={<DeleteOutlined/>}
-                                onClick={handleDelete}
-                            />
-                        </Tooltip>
-                    ) : null}
+                    {actions}
                     <Tooltip title={<Trans>Cancel</Trans>}>
                         <Button
                             icon={<RollbackOutlined/>}
@@ -144,7 +94,6 @@ const UpsertEntry: React.FC<Props> = ({folderId, entry}) => {
                     </Tooltip>
                 </Flex>
             </Form>
-            {deleteModalContext}
         </Flex>
     );
 };
