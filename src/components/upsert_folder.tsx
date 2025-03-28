@@ -31,8 +31,6 @@ const UpsertFolder: React.FC<Props> = ({folder, onFinish}) => {
         }
     }, [users]);
 
-    const handleCancel = (): void => pop();
-
     const parentOptions = folders.map((f) => ({
         label: f.parentId === null ? t({message: "<default>"}) : f.name,
         value: f.id,
@@ -77,7 +75,7 @@ const UpsertFolder: React.FC<Props> = ({folder, onFinish}) => {
                     <Tooltip title={<Trans>Cancel</Trans>}>
                         <Button
                             icon={<RollbackOutlined/>}
-                            onClick={handleCancel}
+                            onClick={pop}
                         />
                     </Tooltip>
                     <Tooltip title={<Trans>Save</Trans>}>

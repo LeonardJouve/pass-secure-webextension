@@ -29,7 +29,7 @@ const colors = [
     "#FFD700",
 ];
 
-const getInitialColor = (initial?: string): string => colors[initial ? initial.charCodeAt(0) % colors.length : 0] as string;
+const getInitialColor = (initial?: string): string => colors[initial?.length ? initial.charCodeAt(0) % colors.length : 0]!;
 
 const UserAvatar: React.FC<Props> = ({userId, showTooltip = true}) => {
     const user = useUsers(useShallow(getUserSelector(userId)));

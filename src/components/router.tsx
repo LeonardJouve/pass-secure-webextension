@@ -3,7 +3,7 @@ import useRouter, {Route} from "../store/router";
 import Login from "./login";
 import Register from "./register";
 import useAuth, {Status} from "../store/auth";
-import App from "./app";
+import Main from "./main";
 import EditProfile from "./edit_profile";
 import CreateEntry from "./create_entry";
 import Unlock from "./unlock";
@@ -20,7 +20,7 @@ const COMPONENTS: Record<Status, Partial<Record<Route, React.FC>>> = {
         [Route.UNLOCK]: Unlock,
     },
     [Status.CONNECTED]: {
-        [Route.MAIN]: App,
+        [Route.MAIN]: Main,
         [Route.EDIT_PROFILE]: EditProfile,
         [Route.CREATE_FOLDER]: CreateFolder,
         [Route.EDIT_FOLDER]: EditFolder,

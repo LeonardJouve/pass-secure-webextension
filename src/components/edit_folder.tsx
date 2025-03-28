@@ -1,12 +1,12 @@
 import React, {useEffect} from "react";
 import {useShallow} from "zustand/react/shallow";
 import useFolders, {getFolderSelector} from "../store/folders";
-import useRouter, {Route} from "../store/router";
+import useRouter from "../store/router";
 import UpsertFolder from "./upsert_folder";
 import type {Folder} from "../api/folders";
 
 const EditFolder: React.FC = () => {
-    const {current, pop, replace} = useRouter();
+    const {current, pop} = useRouter();
     const folderId = Number(current.params["folderId"]);
     const {getFolder, updateFolder} = useFolders();
     const folder = useFolders(useShallow(getFolderSelector(folderId)));
@@ -34,7 +34,7 @@ const EditFolder: React.FC = () => {
         })
 
         if (!response.error) {
-            replace(Route.MAIN);
+            pop();
         }
     };
 

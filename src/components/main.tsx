@@ -1,19 +1,61 @@
-import {StrictMode} from "react";
-import {createRoot} from "react-dom/client";
-import ThemeProvider from "./theme_provider.tsx";
-import IntlProvider from "./intl_provider.tsx";
-import Router from "./router.tsx";
+import React, {useEffect, useState} from "react";
+import {useShallow} from "zustand/shallow";
+import {Divider, Flex, Input} from "antd";
+import {useLingui} from "@lingui/react/macro";
+import useFolders, {getRootFolder} from "../store/folders";
+import Profile from "./profile";
+import FolderCollapse from "./folder_collapse";
+import CreateDropdown from "./create_dropdown";
+import useEntries from "../store/entries";
 
-const root = document.getElementById("root");
+const Main: React.FC = () => {
+    const {t} = useLingui();
+    const rootFolder = useFolders(useShallow(getRootFolder()));
+    const {folders, getFolders} = useFolders();
+    const {entries, getEntries} = useEntries();
+    const [isSearching, setIsSearching] = useState<boolean>(false);
 
-if (root) {
-    createRoot(root).render(
-        <StrictMode>
-            <ThemeProvider>
-                <IntlProvider>
-                    <Router/>
-                </IntlProvider>
-            </ThemeProvider>
-        </StrictMode>,
+    useEffect(() => {
+        if (!folders.length) {
+            getFolders();
+        }
+    }, [folders]);
+
+    useEffect(() => {
+        if (!entries.length) {
+            getEntries();
+        }
+    }, [entries]);
+
+    const handleSearch = async (search: string): Promise<void> => {
+        setIsSearching(true);
+        await getFolders({search});
+        await getEntries({search});
+        setIsSearching(false);
+    };
+
+    if (!rootFolder) {
+        return null;
+    }
+
+    return (
+        <Flex vertical={true} style={{height: "100vh"}}>
+            <Flex gap="small" style={{padding: "15px 15px 0 15px"}}>
+                <Input.Search
+                    placeholder={t({message: "Search"})}
+                    loading={isSearching}
+                    allowClear={true}
+                    onSearch={handleSearch}
+                />
+                <CreateDropdown folderId={rootFolder.id}/>
+                <Profile/>
+            </Flex>
+            <Divider/>
+            <div style={{overflow: "scroll", padding: "0 15px 15px 15px"}}>
+                <FolderCollapse folderId={rootFolder.id}/>
+            </div>
+        </Flex>
     );
-}
+};
+
+export default Main;
