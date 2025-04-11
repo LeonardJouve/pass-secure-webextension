@@ -10,12 +10,12 @@ const ALL = "all";
 
 export const useGetEntry = (entryId: Entry["id"]): UseQueryResult<GetEntryResponse> => useQueryError(useQuery({
     queryKey: [KEY, entryId],
-    queryFn: () => EntriesApi.getEntry(entryId),
+    queryFn: async () => await EntriesApi.getEntry(entryId),
 }));
 
 export const useGetEntries = (input?: GetEntriesInput): UseQueryResult<GetEntriesResponse> => useQueryError(useQuery({
     queryKey: [KEY, ALL, input],
-    queryFn: () => EntriesApi.getEntries(input),
+    queryFn: async () => await EntriesApi.getEntries(input),
 }));
 
 export const useCreateEntry = (): UseMutationResult<CreateEntryResponse, string, CreateEntryInput> => {

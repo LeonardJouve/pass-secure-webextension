@@ -1,5 +1,5 @@
 import {useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult} from "@tanstack/react-query";
-import useAuth, {Status} from "./auth";
+import useAuth from "./auth";
 import type {OkResponse} from "../api/api";
 import type {GetUserResponse, GetUsersResponse, UpdateMeInput, UpdateMeResponse, User} from "../api/users";
 import {useQueryError} from "./utils";
@@ -16,7 +16,7 @@ export const useGetUsers = (): UseQueryResult<GetUsersResponse> => useQueryError
 
 export const useGetUser = (userId: User["id"]|"me"): UseQueryResult<GetUserResponse> => useQueryError(useQuery({
     queryKey: [KEY, userId],
-    queryFn: userId === "me" ? UsersApi.getMe : () => UsersApi.getUser(userId),
+    queryFn: userId === "me" ? UsersApi.getMe : async (): Promise<GetUserResponse> => await UsersApi.getUser(userId),
 }));
 
 export const useUpdateMe = (): UseMutationResult<UpdateMeResponse, string, UpdateMeInput> => {

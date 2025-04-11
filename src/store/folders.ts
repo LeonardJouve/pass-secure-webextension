@@ -10,12 +10,12 @@ const ALL = "all";
 
 export const useGetFolder = (folderId: Folder["id"]): UseQueryResult<GetFolderResponse> => useQueryError(useQuery({
     queryKey: [KEY, folderId],
-    queryFn: () => FoldersApi.getFolder(folderId),
+    queryFn: async () => await FoldersApi.getFolder(folderId),
 }));
 
 export const useGetFolders = <T = GetFoldersResponse>(input?: GetFoldersInput, select?: (response: GetFoldersResponse) => T): UseQueryResult<T> => useQueryError(useQuery({
     queryKey: [KEY, ALL, input],
-    queryFn: () => FoldersApi.getFolders(input),
+    queryFn: async () => await FoldersApi.getFolders(input),
     select,
 }));
 
