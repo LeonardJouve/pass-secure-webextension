@@ -17,6 +17,7 @@ type Props = {
     search: string;
 };
 
+// TODO: loading
 const FolderCollapse: React.FC<Props> = ({folderId, search}) => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
     const {data: folders} = useGetFolders({parentId: folderId, search});

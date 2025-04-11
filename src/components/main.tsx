@@ -6,6 +6,7 @@ import FolderCollapse from "./folder_collapse";
 import CreateDropdown from "./create_dropdown";
 import {useGetRootFolder} from "../store/folders";
 
+// TODO: loading
 const Main: React.FC = () => {
     const {t} = useLingui();
     const [search, setSearch] = useState<string>("");

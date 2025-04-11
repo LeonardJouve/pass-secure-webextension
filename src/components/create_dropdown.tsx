@@ -18,13 +18,13 @@ const CreateDropdown: React.FC<Props> = ({folderId}) => {
                 key: 1,
                 label: <Trans>Create Folder</Trans>,
                 icon: <FolderAddOutlined/>,
-                onClick: (): void => push(Route.CREATE_FOLDER, {parentId: folderId}),
+                onClick: () => push(Route.CREATE_FOLDER, {parentId: folderId}),
             },
             {
                 key: 2,
                 icon: <FileAddOutlined/>,
                 label: <Trans>Create Entry</Trans>,
-                onClick: (): void => push(Route.CREATE_ENTRY, {folderId}),
+                onClick: () => push(Route.CREATE_ENTRY, {folderId}),
             },
         ]}}>
             <Button

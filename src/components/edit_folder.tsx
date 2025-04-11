@@ -4,6 +4,7 @@ import UpsertFolder from "./upsert_folder";
 import type {Folder} from "../api/folders";
 import {useGetFolder, useUpdateFolder} from "../store/folders";
 
+// TODO: loading
 const EditFolder: React.FC = () => {
     const {getParam, pop} = useRouter();
     const folderId = getParam<number>("folderId");

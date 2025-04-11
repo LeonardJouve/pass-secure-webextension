@@ -1,7 +1,6 @@
 import React from "react";
-import {Tooltip, Button, Avatar} from "antd";
+import {Tooltip, Button, Avatar, Skeleton} from "antd";
 import type {User} from "../api/users";
-import LoadingAvatar from "./loading_avatar";
 import {useGetUser} from "../store/users";
 
 type Props = {
@@ -34,7 +33,7 @@ const UserAvatar: React.FC<Props> = ({userId, showTooltip = true}) => {
     const {data: user} = useGetUser(userId);
 
     if (!user) {
-        return <LoadingAvatar/>;
+        return <Skeleton.Avatar active={true}/>;
     }
 
     const initial = user.username[0]?.toUpperCase();

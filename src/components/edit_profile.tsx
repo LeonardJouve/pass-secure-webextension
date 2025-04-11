@@ -9,6 +9,7 @@ import LongPress from "./long_press";
 import type {UpdateMeInput} from "../api/users";
 import {useDeleteMe, useGetUser, useUpdateMe} from "../store/users";
 
+// TODO: loading
 const EditProfile: React.FC = () => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
     const {t} = useLingui();

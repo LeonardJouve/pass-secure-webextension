@@ -7,6 +7,7 @@ import useRouter, {Route} from "../store/router";
 import UserAvatar from "./user_avatar";
 import {useGetUser} from "../store/users";
 
+// TODO: loading
 const Profile: React.FC = () => {
     const {push} = useRouter();
     const [disconnectModal, disconnectModalContext] = Modal.useModal();

@@ -5,7 +5,7 @@ import En from "../icons/en";
 import Fr from "../icons/fr";
 
 const getLocaleFlag = (locale: Locale): React.ReactNode => {
-    const props = {
+    const props: React.SVGProps<SVGSVGElement> = {
         width: 20,
         height: 20,
     };
