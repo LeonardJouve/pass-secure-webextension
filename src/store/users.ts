@@ -2,17 +2,17 @@ import {useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQ
 import useAuth from "./auth";
 import type {OkResponse} from "../api/api";
 import type {GetUserResponse, GetUsersResponse, UpdateMeInput, UpdateMeResponse, User} from "../api/users";
-import {useQueryError} from "./utils";
+import {useQueryCache, useQueryError} from "./utils";
 import useError from "./error";
 import UsersApi from "../api/users";
 
 const KEY = "users";
 const ALL = "all";
 
-export const useGetUsers = (): UseQueryResult<GetUsersResponse> => useQueryError(useQuery({
+export const useGetUsers = (): UseQueryResult<GetUsersResponse> => useQueryError(useQueryCache(useQuery({
     queryKey: [KEY, ALL],
     queryFn: UsersApi.getUsers,
-}));
+}), KEY));
 
 export const useGetUser = (userId: User["id"]|"me"): UseQueryResult<GetUserResponse> => useQueryError(useQuery({
     queryKey: [KEY, userId],

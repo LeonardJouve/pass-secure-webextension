@@ -1,6 +1,6 @@
 import {useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult} from "@tanstack/react-query";
 import useError from "./error";
-import {useQueryError} from "./utils";
+import {useQueryCache, useQueryError} from "./utils";
 import EntriesApi, {type GetEntriesInput} from "../api/entries";
 import type {OkResponse} from "../api/api";
 import type {CreateEntryInput, CreateEntryResponse, Entry, GetEntriesResponse, GetEntryResponse, UpdateEntryResponse} from "../api/entries";
@@ -13,10 +13,10 @@ export const useGetEntry = (entryId: Entry["id"]): UseQueryResult<GetEntryRespon
     queryFn: async () => await EntriesApi.getEntry(entryId),
 }));
 
-export const useGetEntries = (input?: GetEntriesInput): UseQueryResult<GetEntriesResponse> => useQueryError(useQuery({
+export const useGetEntries = (input?: GetEntriesInput): UseQueryResult<GetEntriesResponse> => useQueryError(useQueryCache(useQuery({
     queryKey: [KEY, ALL, input],
     queryFn: async () => await EntriesApi.getEntries(input),
-}));
+}), KEY));
 
 export const useCreateEntry = (): UseMutationResult<CreateEntryResponse, string, CreateEntryInput> => {
     const queryClient = useQueryClient();
