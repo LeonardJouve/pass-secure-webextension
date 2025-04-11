@@ -2,27 +2,28 @@ import {useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQ
 import type {CreateFolderInput, CreateFolderResponse, Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse, UpdateFolderInput, UpdateFolderResponse} from "../api/folders";
 import FoldersApi from "../api/folders";
 import type {OkResponse} from "../api/api";
-import {useQueryError} from "./utils";
+import {useQueryCache, useQueryError} from "./utils";
 import useError from "./error";
 
 const KEY = "folders";
 const ALL = "all";
+const ROOT = "root";
 
 export const useGetFolder = (folderId: Folder["id"]): UseQueryResult<GetFolderResponse> => useQueryError(useQuery({
     queryKey: [KEY, folderId],
     queryFn: async () => await FoldersApi.getFolder(folderId),
 }));
 
-export const useGetFolders = <T = GetFoldersResponse>(input?: GetFoldersInput, select?: (response: GetFoldersResponse) => T): UseQueryResult<T> => useQueryError(useQuery({
+export const useGetFolders = (input?: GetFoldersInput): UseQueryResult<GetFoldersResponse> => useQueryError(useQueryCache(useQuery({
     queryKey: [KEY, ALL, input],
     queryFn: async () => await FoldersApi.getFolders(input),
-    select,
-}));
+}), KEY));
 
-export const useGetRootFolder = (input?: Omit<GetFoldersInput, "parentId">): UseQueryResult<Folder|null> => useGetFolders({
-    ...input,
-    parentId: null,
-}, ([folder]) => folder ?? null);
+export const useGetRootFolder = (): UseQueryResult<Folder|null> => useQueryError(useQuery({
+    queryKey: [KEY, ROOT],
+    queryFn: async () => await FoldersApi.getFolders({parentId: null}),
+    select: ([folder]) => folder ?? null,
+}));
 
 export const useCreateFolder = (): UseMutationResult<CreateFolderResponse, string, CreateFolderInput> => {
     const queryClient = useQueryClient();
