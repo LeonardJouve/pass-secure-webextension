@@ -1,30 +1,18 @@
-import React, {useState} from "react";
-import {Button, Flex, Form, Input, Typography, message} from "antd";
+import React from "react";
+import {Button, Flex, Form, Input, Typography} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
-import useAuth from "../store/auth";
+import {useLogin} from "../store/auth";
 import useRouter, {Route} from "../store/router";
-import type {LoginInput} from "../api/auth";
+import type {LoginInput, LoginResponse} from "../api/auth";
 import LocalePicker from "./locale_picker";
 
 const Login: React.FC = () => {
     const {t} = useLingui();
-    const [errorMessage, errorMessageContext] = message.useMessage();
-    const {login} = useAuth();
+    const login = useLogin();
     const {push} = useRouter();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const handleLogin = async (values: LoginInput): Promise<void> => {
-        setIsLoading(true);
-        const result = await login(values);
-        setIsLoading(false);
-        if (result.error) {
-            errorMessage.open({
-                type: "error",
-                content: result.data.message,
-            });
-        }
-    };
+    const handleLogin = async (values: LoginInput): Promise<LoginResponse> => await login.mutateAsync(values);
 
     const handleRegister = (): void => push(Route.REGISTER);
 
@@ -58,7 +46,6 @@ const Login: React.FC = () => {
                     <Button
                         type="primary"
                         htmlType="submit"
-                        loading={isLoading}
                     >
                         <Trans>Log in</Trans>
                     </Button>
@@ -68,7 +55,6 @@ const Login: React.FC = () => {
                     </Typography.Link>
                 </Form.Item>
             </Form>
-            {errorMessageContext}
         </Flex>
     );
 };

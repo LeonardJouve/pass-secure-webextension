@@ -1,34 +1,23 @@
 import React, {useRef, useState} from "react";
-import {Button, Flex, Form, Input, message, Typography, type InputRef} from "antd";
+import {Button, Flex, Form, Input, Typography, type InputRef} from "antd";
 import {LockOutlined, MailOutlined} from "@ant-design/icons";
 import type {Rule} from "antd/es/form";
 import {Trans, useLingui} from "@lingui/react/macro";
-import useAuth from "../store/auth";
+import {useRegister} from "../store/auth";
 import useRouter, {Route} from "../store/router";
 import type {RegisterInput} from "../api/auth";
 import LocalePicker from "./locale_picker";
 import PasswordStrengthIndicator from "./password_strength_indicator";
+import type {OkResponse} from "../api/api";
 
 const Register: React.FC = () => {
     const {t} = useLingui();
-    const [errorMessage, errorMessageContext] = message.useMessage();
-    const {register} = useAuth();
+    const register = useRegister();
     const {push} = useRouter();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [password, setPassword] = useState<string>("");
     const passwordInputRef = useRef<InputRef>(null);
 
-    const handleRegister = async (values: RegisterInput): Promise<void> => {
-        setIsLoading(true);
-        const result = await register(values);
-        setIsLoading(false);
-        if (result.error) {
-            errorMessage.open({
-                type: "error",
-                content: result.data.message,
-            });
-        }
-    };
+    const handleRegister = async (values: RegisterInput): Promise<OkResponse> => await register.mutateAsync(values);
 
     const handleLogin = (): void => push(Route.LOGIN);
 
@@ -37,7 +26,7 @@ const Register: React.FC = () => {
             if (!value || getFieldValue("password") === value) {
                 return await Promise.resolve();
             }
-            return await Promise.reject(new Error(t({message: "Confirmation does not match"})));
+            return await Promise.reject(new Error(t({message: "Password confirmation does not match"})));
         },
     });
 
@@ -90,7 +79,6 @@ const Register: React.FC = () => {
                     <Button
                         type="primary"
                         htmlType="submit"
-                        loading={isLoading}
                     >
                         <Trans>Register</Trans>
                     </Button>
@@ -99,7 +87,6 @@ const Register: React.FC = () => {
                         <Trans>Log in now</Trans>
                     </Typography.Link>
                 </Form.Item>
-                {errorMessageContext}
             </Form>
         </Flex>
     );

@@ -1,50 +1,17 @@
-import type {MessageDescriptor} from "@lingui/core";
 import {t} from "@lingui/core/macro";
-
-type Result<T> = {
-    error: false;
-    data: T;
-    url: string;
-    status: number;
-};
-
-type Error = {
-    error: true;
-    data: {message: string};
-    url: string;
-};
-
-export type Response<T> = Promise<Result<T> | Error>;
+import type {MessageDescriptor} from "@lingui/core";
 
 export type OkResponse = {
     message: "ok";
 };
 
 class Api {
-    private static readonly retryStatus = [500, 502, 503, 504, 408, 429];
-    private static readonly baseUrl = import.meta.env.VITE_API_URL;
-    private static readonly maxRetry: number = 5;
-
-    static fetch = async <T>(path: string, options: RequestInit, apiTokenRequired = true, retry = 0): Response<T> => {
-        const url = `${this.baseUrl}${path}`;
-
-        if (retry > this.maxRetry) {
-            return {
-                error: true,
-                data: {message: t({message: "Failed to fetch server ressources. Try again later."})},
-                url,
-            };
-        }
-
+    static fetch = async <T>(path: string, options: RequestInit, apiTokenRequired = true): Promise<T> => {
         if (apiTokenRequired && !this.hasToken()) {
-            return {
-                error: true,
-                data: {message: t({message: "Client disconnected. Try logging in."})},
-                url,
-            };
+            throw new Error(t({message: "Client disconnected. Try logging in."}));
         }
 
-        const result = await fetch(url, {
+        const result = await fetch(import.meta.env.VITE_API_URL + path, {
             ...options,
             headers: {
                 "Content-Type": "application/json",
@@ -54,34 +21,16 @@ class Api {
         });
 
         try {
+            const {ok} = result;
             const data = await result.json() as T;
-            const {ok, status} = result;
 
             if (!ok) {
-                if (this.retryStatus.includes(status)) {
-                    return this.fetch(path, options, apiTokenRequired, retry + 1);
-                }
-
-                return {
-                    error: true,
-                    data: {message: t(data as MessageDescriptor)},
-                    url,
-                };
+                throw new Error(t(data as MessageDescriptor));
             }
 
-
-            return {
-                error: false,
-                data,
-                url,
-                status,
-            };
+            return data;
         } catch (_) {
-            return {
-                error: true,
-                data: {message: t({message: "Received invalid response from the server."})},
-                url,
-            };
+            throw new Error(t({message: "Received invalid response from the server."}));
         }
     };
 

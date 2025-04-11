@@ -1,44 +1,42 @@
-import React, {useEffect} from "react";
-import {useShallow} from "zustand/react/shallow";
+import React from "react";
 import {Avatar, Button, Collapse, Flex, List, Modal, Tooltip, type CollapseProps} from "antd";
 import {DeleteOutlined, EditOutlined, FolderOpenOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import type {Folder} from "../api/folders";
-import useFolders, {getChildrenFolders} from "../store/folders";
 import CreateDropdown from "./create_dropdown";
-import useEntries, {getFolderEntries} from "../store/entries";
 import type {Entry} from "../api/entries";
 import ListEntry from "./list_entry";
 import UserAvatar from "./user_avatar";
-import useUsers from "../store/users";
 import useRouter, {Route} from "../store/router";
+import {useGetUser} from "../store/users";
+import {useDeleteFolder, useGetFolders, useGetRootFolder} from "../store/folders";
+import {useGetEntries} from "../store/entries";
 
 type Props = {
     folderId: Folder["id"];
+    search: string;
 };
 
-const FolderCollapse: React.FC<Props> = ({folderId}) => {
+const FolderCollapse: React.FC<Props> = ({folderId, search}) => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
-    const childrenFolders = useFolders(useShallow(getChildrenFolders(folderId)));
-    const folderEntries = useEntries(useShallow(getFolderEntries(folderId)));
-    const {deleteFolder} = useFolders();
-    const {getEntries} = useEntries();
-    const {me} = useUsers();
+    const {data: folders} = useGetFolders({parentId: folderId, search});
+    const {data: entries} = useGetEntries({folderId, search});
+    const {data: root} = useGetRootFolder();
+    const deleteFolder = useDeleteFolder();
+    const {data: me} = useGetUser("me");
     const {push} = useRouter();
 
-    useEffect(() => {
-        if (!folderEntries.length) {
-            getEntries();
-        }
-    }, [folderEntries]);
+    if (!folders || !entries) {
+        return null;
+    }
 
-    const folderItems: CollapseProps["items"] = childrenFolders.map((childFolder, i) => {
+    const folderItems: CollapseProps["items"] = folders.map((folder, i) => {
         const handleEdit: React.MouseEventHandler = (e): void => {
             e.stopPropagation();
-            push(Route.EDIT_FOLDER, {folderId: childFolder.id});
+            push(Route.EDIT_FOLDER, {folderId: folder.id});
         };
 
-        const avatars: React.ReactNode[] = childFolder.userIds
+        const avatars: React.ReactNode[] = folder.userIds
             .filter((userId) => userId !== me?.id)
             .map((userId) => <UserAvatar userId={userId}/>);
 
@@ -47,8 +45,11 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
             showArrow: false,
             label: (
                 <Flex align="center">
-                    <Trans>{childFolder.name}</Trans>
-                    <Flex gap="small" style={{marginLeft: "auto", marginRight: 0}}>
+                    <Trans>{folder.name}</Trans>
+                    <Flex
+                        gap="small"
+                        style={{marginLeft: "auto", marginRight: 0}}
+                    >
                         {avatars.length ? (
                             <Avatar.Group>
                                 {avatars}
@@ -61,11 +62,16 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
                                 onClick={handleEdit}
                             />
                         </Tooltip>
-                        <CreateDropdown folderId={childFolder.id}/>
+                        <CreateDropdown folderId={folder.id}/>
                     </Flex>
                 </Flex>
             ),
-            children: <FolderCollapse folderId={childFolder.id}/>,
+            children: (
+                <FolderCollapse
+                    folderId={folder.id}
+                    search={search}
+                />
+            ),
         };
     });
 
@@ -80,42 +86,44 @@ const FolderCollapse: React.FC<Props> = ({folderId}) => {
             cancelText: <Trans>No</Trans>,
             okType: "danger",
             okButtonProps: {type: "primary"},
-            onOk: () => {
-                deleteFolder(folderId);
-            },
+            onOk: () => deleteFolder.mutate(folderId),
         });
     };
 
-    if (!folderItems.length && !folderEntries.length) {
+    if (!folderItems.length && !entries.length) {
         return (
             <Flex gap="small" align="center" justify="center">
                 <FolderOpenOutlined/>
                 <Trans>No password</Trans>
-                <Tooltip title={<Trans>Delete Folder</Trans>}>
-                    <Button
-                        danger={true}
-                        type="primary"
-                        icon={<DeleteOutlined/>}
-                        onClick={handleDelete}
-                    />
-                </Tooltip>
-                {deleteModalContext}
+                {folderId !== root?.id ? (
+                    <>
+                        <Tooltip title={<Trans>Delete Folder</Trans>}>
+                            <Button
+                                danger={true}
+                                type="primary"
+                                icon={<DeleteOutlined/>}
+                                onClick={handleDelete}
+                            />
+                        </Tooltip>
+                        {deleteModalContext}
+                    </>
+                ) : null}
             </Flex>
         );
     }
 
     return (
         <Flex vertical={true}>
-            {childrenFolders.length ? (
+            {folders.length ? (
                 <Collapse
                     accordion={true}
                     items={folderItems}
                 />
             ) : null}
-            {folderEntries.length ? (
+            {entries.length ? (
                 <List
                     itemLayout="horizontal"
-                    dataSource={folderEntries}
+                    dataSource={entries}
                     renderItem={renderEntry}
                 />
             ) : null}

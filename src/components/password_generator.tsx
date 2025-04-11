@@ -30,11 +30,19 @@ const generate = ({length, allow}: GenerateOption): string => {
     const special = "!@#$%^&*()-_=+[]{}|;:,.<>?";
 
     let characters = "abcdefghijklmnopqrstuvwxyz";
-    if (allow.uppercase) characters += uppercase;
-    if (allow.number) characters += number;
-    if (allow.special) characters += special;
+    if (allow.uppercase) {
+        characters += uppercase;
+    }
 
-    return Array.from({length}, () => characters[crypto.getRandomValues(new Uint32Array(1))[0]! % characters.length]).join("");
+    if (allow.number) {
+        characters += number;
+    }
+
+    if (allow.special) {
+        characters += special;
+    }
+
+    return Array.from({length}, () => characters[crypto.getRandomValues(new Uint32Array(1))[0] ?? 0 % characters.length]).join("");
 };
 
 const PasswordGenerator = forwardRef<InputRef, Props>(({password, setPassword, disabled}, ref) => {

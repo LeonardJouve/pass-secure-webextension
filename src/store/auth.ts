@@ -1,7 +1,8 @@
 import {create} from "zustand";
-import type {LoginInput, LoginResponse, RegisterInput} from "../api/auth";
+import {useMutation, type UseMutationResult} from "@tanstack/react-query";
 import AuthApi from "../api/auth";
-import type {OkResponse, Response} from "../api/api";
+import type {OkResponse} from "../api/api";
+import type {LoginInput, LoginResponse, RegisterInput} from "../api/auth";
 
 export enum Status {
     DISCONNECTED,
@@ -11,25 +12,26 @@ export enum Status {
 
 type AuthStore = {
     status: Status;
-    register: (input: RegisterInput) => Response<OkResponse>;
-    login: (input: LoginInput) => Response<LoginResponse>;
+    connect: () => void;
     disconnect: () => void;
-    unlock: () => void;
+    lock: () => void;
 };
 
 const useAuth = create<AuthStore>((set) => ({
     status: Status.CONNECTED,
-    register: AuthApi.register,
-    login: async (input): Response<LoginResponse> => {
-        const response = await AuthApi.login(input);
-        if (!response.error) {
-            set({status: Status.CONNECTED});
-        }
-
-        return response;
-    },
+    connect: (): void => set({status: Status.CONNECTED}),
     disconnect: (): void => set({status: Status.DISCONNECTED}),
-    unlock: (): void => set({status: Status.CONNECTED}),
+    lock: (): void => set({status: Status.LOCKED}),
 }));
+
+export const useLogin = (): UseMutationResult<LoginResponse, string, LoginInput> => {
+    const {connect} = useAuth();
+    return useMutation({
+        mutationFn: AuthApi.login,
+        onSuccess: connect,
+    });
+};
+
+export const useRegister = (): UseMutationResult<OkResponse, string, RegisterInput> => useMutation({mutationFn: AuthApi.register});
 
 export default useAuth;

@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Button, Flex, Form, Input, Select, Tooltip} from "antd";
 import {CheckOutlined, RollbackOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useRouter from "../store/router";
-import useFolders from "../store/folders";
 import type {Entry} from "../api/entries";
 import RouterBack from "./router_back";
 import PasswordGenerator from "./password_generator";
+import {useGetFolders} from "../store/folders";
 
 type Props = {
     entry: Partial<Entry>;
@@ -17,14 +17,12 @@ type Props = {
 const UpsertEntry: React.FC<Props> = ({entry, onFinish, actions = null}) => {
     const {t} = useLingui();
     const {pop} = useRouter();
-    const {folders, getFolders} = useFolders();
-    const [password, setPassword] = useState<string>(entry?.password ?? "");
+    const {data: folders} = useGetFolders();
+    const [password, setPassword] = useState<string>(entry.password ?? "");
 
-    useEffect(() => {
-        if (!folders) {
-            getFolders();
-        }
-    }, [folders]);
+    if (!folders) {
+        return null;
+    }
 
     const folderOptions = folders.map(({id, name, parentId}) => ({
         label: parentId === null ? t({message: "<default>"}) : name,

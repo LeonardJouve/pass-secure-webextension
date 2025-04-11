@@ -18,7 +18,7 @@ const PASSWORD_STRENGTH_COLORS: Record<PasswordStrength, string> = {
     [PasswordStrength.WEAK]: "#ff7a45",
     [PasswordStrength.MEDIUM]: "#faad14",
     [PasswordStrength.STRONG]: "#52c41a",
-    [PasswordStrength.VERY_STRONG]: "#1890ff"
+    [PasswordStrength.VERY_STRONG]: "#1890ff",
 };
 
 const getPasswordStrength = async (password: string): Promise<PasswordStrength> => {

@@ -1,81 +1,48 @@
-import {create} from "zustand";
-import type {OkResponse, Response} from "../api/api";
+import {useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult} from "@tanstack/react-query";
+import useAuth, {Status} from "./auth";
+import type {OkResponse} from "../api/api";
+import type {GetUserResponse, GetUsersResponse, UpdateMeInput, UpdateMeResponse, User} from "../api/users";
+import {useQueryError} from "./utils";
+import useError from "./error";
 import UsersApi from "../api/users";
-import type {GetMeResponse, GetUserResponse, GetUsersResponse, UpdateMeResponse, User} from "../api/users";
 
-type UsersStore = {
-    me: User|null;
-    users: User[];
-    getMe: () => Response<GetMeResponse>;
-    getUser: (userId: User["id"]) => Response<GetUserResponse>;
-    getUsers: () => Response<GetUsersResponse>;
-    updateMe: (me: Omit<User, "id"> & {password: string}) => Response<UpdateMeResponse>;
-    deleteMe: (disconnect: () => void) => Response<OkResponse>;
-};
+const KEY = "users";
+const ALL = "all";
 
-const useUsers = create<UsersStore>((set) => ({
-    me: null,
-    users: [],
-    getMe: async (): Response<GetMeResponse> => {
-        const response = await UsersApi.getMe();
-        if (!response.error) {
-            set(({users}) => ({
-                me: response.data,
-                users: [
-                    ...users,
-                    response.data,
-                ],
-            }));
-        }
-
-        return response;
-    },
-    getUser: async (userId): Response<GetUserResponse> => {
-        const response = await UsersApi.getUser(userId);
-        if (!response.error) {
-            set(({users}) => ({users: [
-                ...users,
-                response.data,
-            ]}));
-        }
-
-        return response;
-    },
-    getUsers: async (): Response<GetUsersResponse> => {
-        const response = await UsersApi.getUsers();
-        if (!response.error) {
-            set({users: response.data});
-        }
-
-        return response;
-    },
-    deleteMe: async (disconnect): Response<OkResponse> => {
-        const response = await UsersApi.deleteMe();
-        if (!response.error) {
-            set({me: null});
-            disconnect();
-        }
-
-        return response;
-    },
-    updateMe: async (me): Response<UpdateMeResponse> => {
-        const response = await UsersApi.updateMe(me);
-        if (!response.error) {
-            set(({users}) => ({
-                me: response.data,
-                users: users.find(({id}) => id === response.data.id) ? users.map((user) => {
-                    if (user.id === response.data.id) {
-                        return response.data;
-                    }
-                    return user;
-                }) : [...users, response.data],
-            }));
-        }
-
-        return response;
-    }
+export const useGetUsers = (): UseQueryResult<GetUsersResponse> => useQueryError(useQuery({
+    queryKey: [KEY, ALL],
+    queryFn: UsersApi.getUsers,
 }));
 
-export const getUserSelector = (userId: User["id"]|"me"): (state: UsersStore) => User|null => ({users, me}) => userId === "me" ? me : users.find((user) => user.id === userId) ?? null;
+export const useGetUser = (userId: User["id"]|"me"): UseQueryResult<GetUserResponse> => useQueryError(useQuery({
+    queryKey: [KEY, userId],
+    queryFn: userId === "me" ? UsersApi.getMe : () => UsersApi.getUser(userId),
+}));
 
-export default useUsers;
+export const useUpdateMe = (): UseMutationResult<UpdateMeResponse, string, UpdateMeInput> => {
+    const queryClient = useQueryClient();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: UsersApi.updateMe,
+        onSuccess: (data) => {
+            queryClient.setQueryData([KEY, "me"], data);
+            queryClient.setQueryData([KEY, data.id], data);
+            queryClient.invalidateQueries({queryKey: [KEY, ALL]});
+        },
+        onError: setError,
+    });
+};
+
+export const useDeleteMe = (): UseMutationResult<OkResponse, string, void> => {
+    const queryClient = useQueryClient();
+    const {disconnect} = useAuth();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: UsersApi.deleteMe,
+        onSuccess: () => {
+            disconnect();
+            queryClient.removeQueries();
+        },
+        onError: setError,
+    });
+};

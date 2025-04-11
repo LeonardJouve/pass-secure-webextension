@@ -1,80 +1,64 @@
-import {create} from "zustand";
-import type {OkResponse, Response} from "../api/api";
-import type {CreateFolderResponse, Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse, UpdateFolderResponse} from "../api/folders";
+import {useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult} from "@tanstack/react-query";
+import type {CreateFolderInput, CreateFolderResponse, Folder, GetFolderResponse, GetFoldersInput, GetFoldersResponse, UpdateFolderInput, UpdateFolderResponse} from "../api/folders";
 import FoldersApi from "../api/folders";
+import type {OkResponse} from "../api/api";
+import {useQueryError} from "./utils";
+import useError from "./error";
 
-type FoldersStore = {
-    folders: Folder[];
-    getFolders: (input?: GetFoldersInput) => Response<GetFoldersResponse>;
-    getFolder: (folderId: Folder["id"]) => Response<GetFolderResponse>;
-    createFolder: (folder: Omit<Folder, "id"|"ownerId">) => Response<CreateFolderResponse>;
-    updateFolder: (folder: Omit<Folder, "ownerId">) => Response<UpdateFolderResponse>;
-    deleteFolder: (folderId: Folder["id"]) => Response<OkResponse>;
-};
+const KEY = "folders";
+const ALL = "all";
 
-const useFolders = create<FoldersStore>((set) => ({
-    folders: [],
-    getFolders: async (input): Response<GetFoldersResponse> => {
-        const response = await FoldersApi.getFolders(input);
-        if (!response.error) {
-            set({folders: response.data});
-        }
-
-        return response;
-    },
-    getFolder: async (folderId): Response<GetFolderResponse> => {
-        const response = await FoldersApi.getFolder(folderId);
-        if (!response.error) {
-            set(({folders}) => ({folders: folders.find(({id}) => id === response.data.id) ? folders.map((folder) => {
-                if (folder.id === response.data.id) {
-                    return response.data;
-                }
-                return folder;
-            }) : [...folders, response.data]}));
-        }
-
-        return response;
-    },
-    createFolder: async (folder): Response<CreateFolderResponse> => {
-        const response = await FoldersApi.createFolder(folder);
-        if (!response.error) {
-            set(({folders}) => ({folders: folders.find(({id}) => id === response.data.id) ? folders.map((folder) => {
-                if (folder.id === response.data.id) {
-                    return response.data;
-                }
-                return folder;
-            }) : [...folders, response.data]}));
-        }
-
-        return response;
-    },
-    updateFolder: async (folder): Response<UpdateFolderResponse> => {
-        const response = await FoldersApi.updateFolder(folder);
-        if (!response.error) {
-            set(({folders}) => ({folders: folders.find(({id}) => id === response.data.id) ? folders.map((folder) => {
-                if (folder.id === response.data.id) {
-                    return response.data;
-                }
-                return folder;
-            }) : [...folders, response.data]}));
-        }
-
-        return response;
-    },
-    deleteFolder: async (folderId): Response<OkResponse> => {
-        const response = await FoldersApi.deleteFolder(folderId);
-        if (!response.error) {
-            set(({folders}) => ({folders: folders.filter(({id}) => id !== folderId)}));
-        }
-
-        return response;
-    },
+export const useGetFolder = (folderId: Folder["id"]): UseQueryResult<GetFolderResponse> => useQueryError(useQuery({
+    queryKey: [KEY, folderId],
+    queryFn: () => FoldersApi.getFolder(folderId),
 }));
 
-export const getChildrenFolders = (folderId: Folder["id"]): (state: FoldersStore) => Folder[] => (state) => state.folders.filter(({parentId}) => parentId === folderId);
+export const useGetFolders = <T = GetFoldersResponse>(input?: GetFoldersInput, select?: (response: GetFoldersResponse) => T): UseQueryResult<T> => useQueryError(useQuery({
+    queryKey: [KEY, ALL, input],
+    queryFn: () => FoldersApi.getFolders(input),
+    select,
+}));
 
-export const getRootFolder = (): (state: FoldersStore) => Folder|null => (state) => state.folders.find(({parentId}) => parentId === null) ?? null;
+export const useGetRootFolder = (input?: Omit<GetFoldersInput, "parentId">): UseQueryResult<Folder|null> => useGetFolders({
+    ...input,
+    parentId: null,
+}, ([folder]) => folder ?? null);
 
-export const getFolderSelector = (folderId: Folder["id"]): (state: FoldersStore) => Folder|null => (state) => state.folders.find(({id}) => id === folderId) ?? null;
+export const useCreateFolder = (): UseMutationResult<CreateFolderResponse, string, CreateFolderInput> => {
+    const queryClient = useQueryClient();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: FoldersApi.createFolder,
+        onSuccess: (data) => {
+            queryClient.setQueryData([KEY, data.id], data);
+            queryClient.invalidateQueries({queryKey: [KEY, ALL]});
+        },
+        onError: setError,
+    });
+};
 
-export default useFolders;
+export const useUpdateFolder = (): UseMutationResult<UpdateFolderResponse, string, UpdateFolderInput> => {
+    const queryClient = useQueryClient();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: FoldersApi.updateFolder,
+        onSuccess: (data) => {
+            queryClient.setQueryData([KEY, data.id], data);
+            queryClient.invalidateQueries({queryKey: [KEY, ALL]});
+        },
+        onError: setError,
+    });
+};
+
+export const useDeleteFolder = (): UseMutationResult<OkResponse, string, Folder["id"]> => {
+    const queryClient = useQueryClient();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: FoldersApi.deleteFolder,
+        onSuccess: (_, folderId) => {
+            queryClient.removeQueries({queryKey: [KEY, folderId]});
+            queryClient.removeQueries({queryKey: [KEY, ALL]});
+        },
+        onError: setError,
+    });
+};

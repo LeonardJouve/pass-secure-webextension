@@ -2,44 +2,35 @@ import React, {useEffect} from "react";
 import {Button, Modal, Tooltip} from "antd";
 import {DeleteOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
-import {useShallow} from "zustand/react/shallow";
 import useRouter from "../store/router";
-import useEntries, {getEntrySelector} from "../store/entries";
+import {useDeleteEntry, useGetEntry, useUpdateEntry} from "../store/entries";
 import UpsertEntry from "./upsert_entry";
 import type {Entry} from "../api/entries";
 
 const EditEntry: React.FC = () => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
-    const {current, pop} = useRouter();
-    const entryId = Number(current.params["entryId"]);
-    const {getEntry, updateEntry, deleteEntry} = useEntries();
-    const entry = useEntries(useShallow(getEntrySelector(entryId)));
+    const {getParam, pop} = useRouter();
+    const entryId = getParam<number>("entryId");
+    const {data: entry} = useGetEntry(entryId ?? -1);
+    const updateEntry = useUpdateEntry();
+    const deleteEntry = useDeleteEntry();
 
     useEffect(() => {
         if (!entryId) {
             pop();
         }
-    }, [current]);
+    }, [entryId]);
 
-    useEffect(() => {
-        if (!entry && entryId) {
-            getEntry(entryId);
-        }
-    }, [entry, current]);
-
-    if (!entryId || !entry) {
+    if (!entry) {
         return null;
     }
 
     const handleUpdate = async (values: Omit<Entry, "id">): Promise<void> => {
-        const response = await updateEntry({
+        await updateEntry.mutateAsync({
             ...values,
             id: entry.id,
         });
-
-        if (!response.error) {
-            pop();
-        }
+        pop();
     };
 
 
@@ -52,9 +43,7 @@ const EditEntry: React.FC = () => {
             cancelText: <Trans>No</Trans>,
             okType: "danger",
             okButtonProps: {type: "primary"},
-            onOk: () => {
-                deleteEntry(entry.id);
-            },
+            onOk: () => deleteEntry.mutate(entry.id),
         });
     };
 

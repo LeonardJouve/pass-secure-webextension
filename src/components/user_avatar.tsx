@@ -1,9 +1,8 @@
-import React, {useEffect} from "react";
-import {useShallow} from "zustand/react/shallow";
+import React from "react";
 import {Tooltip, Button, Avatar} from "antd";
 import type {User} from "../api/users";
 import LoadingAvatar from "./loading_avatar";
-import useUsers, {getUserSelector} from "../store/users";
+import {useGetUser} from "../store/users";
 
 type Props = {
     userId: User["id"]|"me";
@@ -29,21 +28,10 @@ const colors = [
     "#FFD700",
 ];
 
-const getInitialColor = (initial?: string): string => colors[initial?.length ? initial.charCodeAt(0) % colors.length : 0]!;
+const getInitialColor = (initial?: string): string => colors[initial?.length ? initial.charCodeAt(0) % colors.length : 0] ?? "";
 
 const UserAvatar: React.FC<Props> = ({userId, showTooltip = true}) => {
-    const user = useUsers(useShallow(getUserSelector(userId)));
-    const {getMe, getUser} = useUsers();
-
-    useEffect(() => {
-        if (!user) {
-            if (userId === "me") {
-                getMe();
-            } else {
-                getUser(userId);
-            }
-        }
-    }, [user]);
+    const {data: user} = useGetUser(userId);
 
     if (!user) {
         return <LoadingAvatar/>;

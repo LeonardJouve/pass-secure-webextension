@@ -2,15 +2,15 @@ import React from "react";
 import {Button, Dropdown, Modal, type MenuProps} from "antd";
 import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
-import useUsers from "../store/users";
 import useAuth from "../store/auth";
 import useRouter, {Route} from "../store/router";
 import UserAvatar from "./user_avatar";
+import {useGetUser} from "../store/users";
 
 const Profile: React.FC = () => {
     const {push} = useRouter();
     const [disconnectModal, disconnectModalContext] = Modal.useModal();
-    const {me} = useUsers();
+    const {data: me} = useGetUser("me");
     const {disconnect} = useAuth();
 
     const menu: MenuProps = {items: me ? [

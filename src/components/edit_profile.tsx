@@ -1,35 +1,27 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Button, Flex, Form, Input, Modal, Tooltip} from "antd";
 import {CheckOutlined, DeleteOutlined, LockOutlined, RollbackOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
-import useUsers from "../store/users";
-import useAuth from "../store/auth";
 import useRouter from "../store/router";
 import LocalePicker from "./locale_picker";
 import RouterBack from "./router_back";
 import LongPress from "./long_press";
-import type {User} from "../api/users";
+import type {UpdateMeInput} from "../api/users";
+import {useDeleteMe, useGetUser, useUpdateMe} from "../store/users";
 
 const EditProfile: React.FC = () => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
     const {t} = useLingui();
     const {pop} = useRouter();
-    const {disconnect} = useAuth();
-    const {me, deleteMe, getMe, updateMe} = useUsers();
-
-    useEffect(() => {
-        if (!me) {
-            getMe();
-        }
-    }, [me]);
+    const {data: me} = useGetUser("me");
+    const updateMe = useUpdateMe();
+    const deleteMe = useDeleteMe();
 
     const handleCancel = pop;
 
-    const handleSave = async (values: Omit<User, "id"> & {password: string}): Promise<void> => {
-        const response = await updateMe(values);
-        if (!response.error) {
-            pop();
-        }
+    const handleSave = async (values: UpdateMeInput): Promise<void> => {
+        await updateMe.mutateAsync(values);
+        pop();
     };
 
     const handleDelete = (): void => {
@@ -52,14 +44,14 @@ const EditProfile: React.FC = () => {
                         danger={true}
                         delay={5_000}
                         onLongPress={() => {
-                            deleteMe(disconnect);
+                            deleteMe.mutate();
                             modal.destroy();
                         }}
                     >
                         <Trans>Ok</Trans>
                     </LongPress>
                 </Flex>
-              ),
+            ),
         });
     };
 

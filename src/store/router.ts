@@ -24,9 +24,10 @@ type RouterStore = {
     push: (route: Entry["route"], params?: Entry["params"]) => void;
     pop: () => void;
     replace: (route: Entry["route"], params?: Entry["params"]) => void;
+    getParam: <T>(name: string) => T|null;
 };
 
-const useRouter = create<RouterStore>((set) => ({
+const useRouter = create<RouterStore>((set, get) => ({
     stack: [],
     current: {route: Route.LOGIN, params: {}},
     clear: (route: Entry["route"], params: Entry["params"] = {}): void => set({stack: [], current: {route, params}}),
@@ -41,6 +42,10 @@ const useRouter = create<RouterStore>((set) => ({
         return {stack: newStack, current};
     }),
     replace: (route, params = {}): void => set({current: {route, params}}),
+    getParam: <T>(name: string): T|null => {
+        const {current} = get();
+        return current.params[name] as T|undefined ?? null;
+    },
 }));
 
 export default useRouter;

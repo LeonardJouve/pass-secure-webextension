@@ -1,79 +1,58 @@
-import {create} from "zustand";
-import type {OkResponse, Response} from "../api/api";
-import type {CreateEntryResponse, Entry, GetEntriesResponse, GetEntryResponse, UpdateEntryResponse} from "../api/entries";
+import {useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult} from "@tanstack/react-query";
+import useError from "./error";
+import {useQueryError} from "./utils";
 import EntriesApi, {type GetEntriesInput} from "../api/entries";
-import type {Folder} from "../api/folders";
+import type {OkResponse} from "../api/api";
+import type {CreateEntryInput, CreateEntryResponse, Entry, GetEntriesResponse, GetEntryResponse, UpdateEntryResponse} from "../api/entries";
 
-type EntriesStore = {
-    entries: Entry[];
-    getEntries: (input?: GetEntriesInput) => Response<GetEntriesResponse>;
-    deleteEntry: (entryId: Entry["id"]) => Response<OkResponse>;
-    getEntry: (entryId: Entry["id"]) => Response<GetEntryResponse>;
-    updateEntry: (entry: Entry) => Response<UpdateEntryResponse>;
-    createEntry: (entry: Omit<Entry, "id">) => Response<CreateEntryResponse>;
-};
+const KEY = "entries";
+const ALL = "all";
 
-const useEntries = create<EntriesStore>((set) => ({
-    entries: [],
-    getEntries: async (input): Response<GetEntriesResponse> => {
-        const response = await EntriesApi.getEntries(input);
-        if (!response.error) {
-            set({entries: response.data});
-        }
-
-        return response;
-    },
-    deleteEntry: async (entryId): Response<OkResponse> => {
-        const response = await EntriesApi.deleteEntry(entryId);
-        if (!response.error) {
-            set(({entries}) => ({entries: entries.filter(({id}) => id !== entryId)}));
-        }
-
-        return response;
-    },
-    getEntry: async (entryId): Response<GetEntryResponse> => {
-        const response = await EntriesApi.getEntry(entryId);
-        if (!response.error) {
-            set(({entries}) => ({entries: entries.find(({id}) => id === response.data.id) ? entries.map((entry) => {
-                if (entry.id === response.data.id) {
-                    return response.data;
-                }
-                return entry;
-            }) : [...entries, response.data]}));
-        }
-
-        return response;
-    },
-    updateEntry: async (entry): Response<UpdateEntryResponse> => {
-        const response = await EntriesApi.updateEntry(entry);
-        if (!response.error) {
-            set(({entries}) => ({entries: entries.find(({id}) => id === response.data.id) ? entries.map((entry) => {
-                if (entry.id === response.data.id) {
-                    return response.data;
-                }
-                return entry;
-            }) : [...entries, response.data]}));
-        }
-
-        return response;
-    },
-    createEntry: async (entry): Response<CreateEntryResponse> => {
-        const response = await EntriesApi.createEntry(entry);
-        if (!response.error) {
-            set(({entries}) => ({entries: entries.find(({id}) => id === response.data.id) ? entries.map((entry) => {
-                if (entry.id === response.data.id) {
-                    return response.data;
-                }
-                return entry;
-            }) : [...entries, response.data]}));
-        }
-
-        return response;
-    }
+export const useGetEntry = (entryId: Entry["id"]): UseQueryResult<GetEntryResponse> => useQueryError(useQuery({
+    queryKey: [KEY, entryId],
+    queryFn: () => EntriesApi.getEntry(entryId),
 }));
 
-export const getFolderEntries = (folderId: Folder["id"]): (state: EntriesStore) => Entry[] => (state) => state.entries.filter((entry) => entry.folderId === folderId);
+export const useGetEntries = (input?: GetEntriesInput): UseQueryResult<GetEntriesResponse> => useQueryError(useQuery({
+    queryKey: [KEY, ALL, input],
+    queryFn: () => EntriesApi.getEntries(input),
+}));
 
-export const getEntrySelector = (entryId: Entry["id"]): (state: EntriesStore) => Entry|null => (state) => state.entries.find(({id}) => id === entryId) ?? null;
+export const useCreateEntry = (): UseMutationResult<CreateEntryResponse, string, CreateEntryInput> => {
+    const queryClient = useQueryClient();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: EntriesApi.createEntry,
+        onSuccess: (data) => {
+            queryClient.setQueryData([KEY, data.id], data);
+            queryClient.invalidateQueries({queryKey: [KEY, ALL]});
+        },
+        onError: setError,
+    });
+};
 
-export default useEntries;
+export const useUpdateEntry = (): UseMutationResult<UpdateEntryResponse, string, Entry> => {
+    const queryClient = useQueryClient();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: EntriesApi.updateEntry,
+        onSuccess: (data) => {
+            queryClient.setQueryData([KEY, data.id], data);
+            queryClient.invalidateQueries({queryKey: [KEY, ALL]});
+        },
+        onError: setError,
+    });
+};
+
+export const useDeleteEntry = (): UseMutationResult<OkResponse, string, Entry["id"]> => {
+    const queryClient = useQueryClient();
+    const {setError} = useError();
+    return useMutation({
+        mutationFn: EntriesApi.deleteEntry,
+        onSuccess: (_, entryId) => {
+            queryClient.removeQueries({queryKey: [KEY, entryId]});
+            queryClient.invalidateQueries({queryKey: [KEY, ALL]});
+        },
+        onError: setError,
+    });
+};

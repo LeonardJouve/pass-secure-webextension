@@ -1,12 +1,12 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Flex, Form, Input, Tooltip, Button, Select} from "antd";
 import {RollbackOutlined, CheckOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useRouter from "../store/router";
-import useUsers from "../store/users";
-import useFolders from "../store/folders";
 import RouterBack from "./router_back";
 import type {Folder} from "../api/folders";
+import {useGetUser, useGetUsers} from "../store/users";
+import {useGetFolders} from "../store/folders";
 
 type Props = {
     folder: Partial<Folder>;
@@ -16,32 +16,25 @@ type Props = {
 const UpsertFolder: React.FC<Props> = ({folder, onFinish}) => {
     const {t} = useLingui();
     const {pop} = useRouter();
-    const {folders, getFolders} = useFolders();
-    const {me, users, getUsers} = useUsers();
+    const {data: folders} = useGetFolders();
+    const {data: me} = useGetUser("me");
+    const {data: users} = useGetUsers();
 
-    useEffect(() => {
-        if (!folders) {
-            getFolders();
-        }
-    }, [folders]);
-
-    useEffect(() => {
-        if (!users) {
-            getUsers();
-        }
-    }, [users]);
+    if (!folders) {
+        return null;
+    }
 
     const parentOptions = folders.map((f) => ({
         label: f.parentId === null ? t({message: "<default>"}) : f.name,
         value: f.id,
     }));
 
-    const userOptions = users
+    const userOptions = users ? users
         .filter(({id}) => id !== me?.id)
         .map(({email, id}) => ({
             label: email,
             value: id,
-        }));
+        })) : [];
 
     return (
         <Flex vertical={true}>

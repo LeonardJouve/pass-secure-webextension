@@ -1,58 +1,44 @@
-import React, {useEffect, useState} from "react";
-import {useShallow} from "zustand/shallow";
+import React, {useState} from "react";
 import {Divider, Flex, Input} from "antd";
 import {useLingui} from "@lingui/react/macro";
-import useFolders, {getRootFolder} from "../store/folders";
 import Profile from "./profile";
 import FolderCollapse from "./folder_collapse";
 import CreateDropdown from "./create_dropdown";
-import useEntries from "../store/entries";
+import {useGetRootFolder} from "../store/folders";
 
 const Main: React.FC = () => {
     const {t} = useLingui();
-    const rootFolder = useFolders(useShallow(getRootFolder()));
-    const {folders, getFolders} = useFolders();
-    const {entries, getEntries} = useEntries();
-    const [isSearching, setIsSearching] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>("");
+    const {data: root} = useGetRootFolder();
 
-    useEffect(() => {
-        if (!folders.length) {
-            getFolders();
-        }
-    }, [folders]);
-
-    useEffect(() => {
-        if (!entries.length) {
-            getEntries();
-        }
-    }, [entries]);
-
-    const handleSearch = async (search: string): Promise<void> => {
-        setIsSearching(true);
-        await getFolders({search});
-        await getEntries({search});
-        setIsSearching(false);
-    };
-
-    if (!rootFolder) {
+    if (!root) {
         return null;
     }
 
     return (
-        <Flex vertical={true} style={{height: "100vh"}}>
-            <Flex gap="small" style={{padding: "15px 15px 0 15px"}}>
+        <Flex
+            vertical={true}
+            style={{height: "100vh"}}
+        >
+            <Flex
+                gap="small"
+                style={{padding: "15px 15px 0 15px"}}
+            >
                 <Input.Search
                     placeholder={t({message: "Search"})}
-                    loading={isSearching}
                     allowClear={true}
-                    onSearch={handleSearch}
+                    value={search}
+                    onSearch={setSearch}
                 />
-                <CreateDropdown folderId={rootFolder.id}/>
+                <CreateDropdown folderId={root.id}/>
                 <Profile/>
             </Flex>
             <Divider/>
             <div style={{overflow: "scroll", padding: "0 15px 15px 15px"}}>
-                <FolderCollapse folderId={rootFolder.id}/>
+                <FolderCollapse
+                    folderId={root.id}
+                    search={search}
+                />
             </div>
         </Flex>
     );

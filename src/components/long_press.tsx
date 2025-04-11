@@ -22,7 +22,7 @@ const LongPress: React.FC<Props> = ({onLongPress, delay, children, ...props}) =>
             timer.current = undefined;
         }
 
-        return () => {
+        return (): void => {
             window.clearTimeout(timer.current);
             timer.current = undefined;
         };

@@ -5,7 +5,7 @@ import {Trans} from "@lingui/react/macro";
 import useAuth from "../store/auth";
 
 const Unlock: React.FC = () => {
-    const {disconnect, unlock} = useAuth();
+    const {disconnect, connect} = useAuth();
 
     return (
         <Flex>
@@ -13,7 +13,7 @@ const Unlock: React.FC = () => {
                 <Button
                     icon={<LockOutlined/>}
                     type="primary"
-                    onClick={unlock}
+                    onClick={connect}
                 />
                 <Button
                     icon={<DisconnectOutlined/>}
