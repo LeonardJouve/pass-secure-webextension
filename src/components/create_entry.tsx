@@ -19,10 +19,7 @@ const CreateEntry: React.FC = () => {
         return null;
     }
 
-    const handleCreate = async (values: CreateEntryInput): Promise<void> => {
-        await createEntry.mutateAsync(values);
-        pop();
-    };
+    const handleCreate = async (values: CreateEntryInput): Promise<void> => await createEntry.mutateAsync(values).then(pop);
 
     return (
         <UpsertEntry

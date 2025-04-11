@@ -25,13 +25,10 @@ const EditEntry: React.FC = () => {
         return null;
     }
 
-    const handleUpdate = async (values: Omit<Entry, "id">): Promise<void> => {
-        await updateEntry.mutateAsync({
-            ...values,
-            id: entry.id,
-        });
-        pop();
-    };
+    const handleUpdate = async (values: Omit<Entry, "id">): Promise<void> => await updateEntry.mutateAsync({
+        ...values,
+        id: entry.id,
+    }).then(pop);
 
 
     const handleDelete = (): void => {

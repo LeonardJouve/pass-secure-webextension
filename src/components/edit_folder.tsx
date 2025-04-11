@@ -20,13 +20,10 @@ const EditFolder: React.FC = () => {
         return null;
     }
 
-    const handleUpdate = async (values: Omit<Folder, "id"|"ownerId">): Promise<void> => {
-        await updateFolder.mutateAsync({
-            ...values,
-            id: folder.id,
-        });
-        pop();
-    };
+    const handleUpdate = async (values: Omit<Folder, "id"|"ownerId">): Promise<void> => await updateFolder.mutateAsync({
+        ...values,
+        id: folder.id,
+    }).then(pop);
 
     return (
         <UpsertFolder

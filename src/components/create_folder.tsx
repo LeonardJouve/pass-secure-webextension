@@ -19,10 +19,7 @@ const CreateFolder: React.FC = () => {
         return null;
     }
 
-    const handleCreate = async (values: CreateFolderInput): Promise<void> => {
-        await createFolder.mutateAsync(values);
-        pop();
-    };
+    const handleCreate = async (values: CreateFolderInput): Promise<void> => await createFolder.mutateAsync(values).then(pop);
 
     return (
         <UpsertFolder

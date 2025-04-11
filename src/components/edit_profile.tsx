@@ -19,10 +19,7 @@ const EditProfile: React.FC = () => {
 
     const handleCancel = pop;
 
-    const handleSave = async (values: UpdateMeInput): Promise<void> => {
-        await updateMe.mutateAsync(values);
-        pop();
-    };
+    const handleSave = async (values: UpdateMeInput): Promise<void> => await updateMe.mutateAsync(values).then(pop);
 
     const handleDelete = (): void => {
         const modal = deleteModal.confirm({
