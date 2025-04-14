@@ -7,6 +7,7 @@ import useRouter from "../store/router";
 import LocalePicker from "./locale_picker";
 import RouterBack from "./router_back";
 import LongPress from "./long_press";
+import ThemePicker from "./theme_picker";
 import type {UpdateMeInput} from "../api/users";
 import {useDeleteMe, useGetUser, useUpdateMe} from "../store/users";
 
@@ -69,7 +70,10 @@ const EditProfile: React.FC = () => {
         >
             <Flex justify="space-between">
                 <RouterBack/>
-                <LocalePicker/>
+                <Flex gap={"small"}>
+                    <ThemePicker/>
+                    <LocalePicker/>
+                </Flex>
             </Flex>
             {isLoading ? (
                 <Skeleton active={true}/>
