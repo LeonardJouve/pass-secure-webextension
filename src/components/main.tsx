@@ -1,20 +1,16 @@
 import React, {useState} from "react";
 import {Divider, Flex, Input} from "antd";
+import {LoadingOutlined} from "@ant-design/icons";
 import {useLingui} from "@lingui/react/macro";
 import Profile from "./profile";
 import FolderCollapse from "./folder_collapse";
 import CreateDropdown from "./create_dropdown";
 import {useGetRootFolder} from "../store/folders";
 
-// TODO: loading
 const Main: React.FC = () => {
     const {t} = useLingui();
     const [search, setSearch] = useState<string>("");
-    const {data: root} = useGetRootFolder();
-
-    if (!root) {
-        return null;
-    }
+    const {isLoading, data: root} = useGetRootFolder();
 
     return (
         <Flex
@@ -31,15 +27,25 @@ const Main: React.FC = () => {
                     value={search}
                     onSearch={setSearch}
                 />
-                <CreateDropdown folderId={root.id}/>
+                {root ? <CreateDropdown folderId={root.id}/> : null}
                 <Profile/>
             </Flex>
             <Divider/>
             <div style={{overflow: "scroll", padding: "0 15px 15px 15px"}}>
-                <FolderCollapse
-                    folderId={root.id}
-                    search={search}
-                />
+                {root ? (
+                    <FolderCollapse
+                        folderId={root.id}
+                        search={search}
+                    />
+                ) : null}
+                {isLoading ? (
+                    <Flex
+                        justify="center"
+                        align="center"
+                    >
+                        <LoadingOutlined/>
+                    </Flex>
+                ) : null}
             </div>
         </Flex>
     );

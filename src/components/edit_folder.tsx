@@ -1,14 +1,14 @@
 import React, {useEffect} from "react";
+import {Skeleton} from "antd";
 import useRouter from "../store/router";
 import UpsertFolder from "./upsert_folder";
 import type {Folder} from "../api/folders";
 import {useGetFolder, useUpdateFolder} from "../store/folders";
 
-// TODO: loading
 const EditFolder: React.FC = () => {
     const {getParam, pop} = useRouter();
     const folderId = getParam<number>("folderId");
-    const {data: folder} = useGetFolder(folderId ?? -1);
+    const {isLoading, data: folder} = useGetFolder(folderId ?? -1);
     const updateFolder = useUpdateFolder();
 
     useEffect(() => {
@@ -16,6 +16,10 @@ const EditFolder: React.FC = () => {
             pop();
         }
     }, [folderId]);
+
+    if (isLoading) {
+        return <Skeleton active={true}/>;
+    }
 
     if (!folder) {
         return null;

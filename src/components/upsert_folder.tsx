@@ -1,5 +1,5 @@
 import React from "react";
-import {Flex, Form, Input, Tooltip, Button, Select} from "antd";
+import {Flex, Form, Input, Tooltip, Button, Select, Skeleton} from "antd";
 import {RollbackOutlined, CheckOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useRouter from "../store/router";
@@ -16,15 +16,11 @@ type Props = {
 const UpsertFolder: React.FC<Props> = ({folder, onFinish}) => {
     const {t} = useLingui();
     const {pop} = useRouter();
-    const {data: folders} = useGetFolders();
+    const {isLoading, data: folders} = useGetFolders();
     const {data: me} = useGetUser("me");
     const {data: users} = useGetUsers();
 
-    if (!folders) {
-        return null;
-    }
-
-    const parentOptions = folders.map((f) => ({
+    const parentOptions = folders?.map((f) => ({
         label: f.parentId === null ? t({message: "<default>"}) : f.name,
         value: f.id,
     }));
@@ -54,7 +50,11 @@ const UpsertFolder: React.FC<Props> = ({folder, onFinish}) => {
                     name="parentId"
                     rules={[{required: true, message: t({message: "Select folder Parent"})}]}
                 >
-                    <Select options={parentOptions}/>
+                    {isLoading ? (
+                        <Skeleton.Input active={true}/>
+                    ) : (
+                        <Select options={parentOptions}/>
+                    )}
                 </Form.Item>
                 <Form.Item name="userIds">
                     <Select

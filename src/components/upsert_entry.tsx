@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Flex, Form, Input, Select, Tooltip} from "antd";
+import {Button, Flex, Form, Input, Select, Skeleton, Tooltip} from "antd";
 import {CheckOutlined, RollbackOutlined} from "@ant-design/icons";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useRouter from "../store/router";
@@ -17,14 +17,10 @@ type Props = {
 const UpsertEntry: React.FC<Props> = ({entry, onFinish, actions = null}) => {
     const {t} = useLingui();
     const {pop} = useRouter();
-    const {data: folders} = useGetFolders();
+    const {isLoading, data: folders} = useGetFolders();
     const [password, setPassword] = useState<string>(entry.password ?? "");
 
-    if (!folders) {
-        return null;
-    }
-
-    const folderOptions = folders.map(({id, name, parentId}) => ({
+    const folderOptions = folders?.map(({id, name, parentId}) => ({
         label: parentId === null ? t({message: "<default>"}) : name,
         value: id,
     }));
@@ -71,7 +67,11 @@ const UpsertEntry: React.FC<Props> = ({entry, onFinish, actions = null}) => {
                     name="folderId"
                     rules={[{required: true, message: t({message: "Select entry Folder"})}]}
                 >
-                    <Select options={folderOptions}/>
+                    {isLoading ? (
+                        <Skeleton.Input active={true}/>
+                    ) : (
+                        <Select options={folderOptions}/>
+                    )}
                 </Form.Item>
                 <Flex justify="right" gap="small">
                     {actions}

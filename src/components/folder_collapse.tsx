@@ -1,5 +1,5 @@
 import React from "react";
-import {Avatar, Button, Collapse, Flex, List, Modal, Tooltip, type CollapseProps} from "antd";
+import {Avatar, Button, Collapse, Flex, List, Modal, Skeleton, Tooltip, type CollapseProps} from "antd";
 import {DeleteOutlined, EditOutlined, FolderOpenOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import type {Folder} from "../api/folders";
@@ -17,21 +17,16 @@ type Props = {
     search: string;
 };
 
-// TODO: loading
 const FolderCollapse: React.FC<Props> = ({folderId, search}) => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
-    const {data: folders} = useGetFolders({parentId: folderId, search});
-    const {data: entries} = useGetEntries({folderId, search});
+    const {isLoading: isLoadingFolders, data: folders} = useGetFolders({parentId: folderId, search});
+    const {isLoading: isLoadingEntries, data: entries} = useGetEntries({folderId, search});
     const {data: root} = useGetRootFolder();
     const deleteFolder = useDeleteFolder();
     const {data: me} = useGetUser("me");
     const {push} = useRouter();
 
-    if (!folders || !entries) {
-        return null;
-    }
-
-    const folderItems: CollapseProps["items"] = folders.map((folder, i) => {
+    const folderItems: CollapseProps["items"] = folders?.map((folder, i) => {
         const handleEdit: React.MouseEventHandler = (e): void => {
             e.stopPropagation();
             push(Route.EDIT_FOLDER, {folderId: folder.id});
@@ -91,7 +86,7 @@ const FolderCollapse: React.FC<Props> = ({folderId, search}) => {
         });
     };
 
-    if (!folderItems.length && !entries.length) {
+    if (folderItems?.length === 0 && entries?.length === 0) {
         return (
             <Flex gap="small" align="center" justify="center">
                 <FolderOpenOutlined/>
@@ -115,18 +110,21 @@ const FolderCollapse: React.FC<Props> = ({folderId, search}) => {
 
     return (
         <Flex vertical={true}>
-            {folders.length ? (
+            {folderItems?.length ? (
                 <Collapse
                     accordion={true}
                     items={folderItems}
                 />
             ) : null}
-            {entries.length ? (
+            {entries?.length ? (
                 <List
                     itemLayout="horizontal"
                     dataSource={entries}
                     renderItem={renderEntry}
                 />
+            ) : null}
+            {isLoadingFolders || isLoadingEntries ? (
+                <Skeleton active={true}/>
             ) : null}
         </Flex>
     );

@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Dropdown, Modal, type MenuProps} from "antd";
+import {Button, Dropdown, Flex, Modal, Skeleton, theme, type MenuProps} from "antd";
 import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import useAuth from "../store/auth";
@@ -7,18 +7,18 @@ import useRouter, {Route} from "../store/router";
 import UserAvatar from "./user_avatar";
 import {useGetUser} from "../store/users";
 
-// TODO: loading
 const Profile: React.FC = () => {
     const {push} = useRouter();
     const [disconnectModal, disconnectModalContext] = Modal.useModal();
-    const {data: me} = useGetUser("me");
+    const {token} = theme.useToken();
+    const {isLoading, data: me} = useGetUser("me");
     const {disconnect} = useAuth();
 
-    const menu: MenuProps = {items: me ? [
+    const menu: MenuProps = {items: [
         {
             key: 0,
             icon: <UserOutlined/>,
-            label: me.username,
+            label: me?.username,
             onClick: () => push(Route.EDIT_PROFILE),
         },
         {
@@ -37,11 +37,25 @@ const Profile: React.FC = () => {
                 onOk: disconnect,
             }),
         },
-    ] : []};
+    ]};
+
+    const renderLoading = (): React.ReactNode => (
+        <Flex
+            vertical={true}
+            gap="small"
+            style={{backgroundColor: token.colorBgElevated}}
+        >
+            {menu.items?.map(() => <Skeleton.Input active={true}/>) ?? null}
+        </Flex>
+    );
 
     return (
         <>
-            <Dropdown menu={menu} placement="bottomRight">
+            <Dropdown
+                menu={menu}
+                placement="bottomRight"
+                dropdownRender={isLoading ? renderLoading : undefined}
+            >
                 <Button shape="circle" type="text">
                     <UserAvatar
                         userId={"me"}

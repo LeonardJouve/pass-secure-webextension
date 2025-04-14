@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {Button, Modal, Tooltip} from "antd";
+import {Button, Modal, Skeleton, Tooltip} from "antd";
 import {DeleteOutlined} from "@ant-design/icons";
 import {Trans} from "@lingui/react/macro";
 import useRouter from "../store/router";
@@ -7,12 +7,11 @@ import {useDeleteEntry, useGetEntry, useUpdateEntry} from "../store/entries";
 import UpsertEntry from "./upsert_entry";
 import type {Entry} from "../api/entries";
 
-// TODO: loading
 const EditEntry: React.FC = () => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
     const {getParam, pop} = useRouter();
     const entryId = getParam<number>("entryId");
-    const {data: entry} = useGetEntry(entryId ?? -1);
+    const {isLoading, data: entry} = useGetEntry(entryId ?? -1);
     const updateEntry = useUpdateEntry();
     const deleteEntry = useDeleteEntry();
 
@@ -21,6 +20,10 @@ const EditEntry: React.FC = () => {
             pop();
         }
     }, [entryId]);
+
+    if (isLoading) {
+        return <Skeleton active={true}/>;
+    }
 
     if (!entry) {
         return null;

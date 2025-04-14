@@ -1,6 +1,7 @@
 import React from "react";
-import {Button, Flex, Form, Input, Modal, Tooltip} from "antd";
+import {Button, Flex, Form, Input, Modal, Skeleton, Tooltip} from "antd";
 import {CheckOutlined, DeleteOutlined, LockOutlined, RollbackOutlined} from "@ant-design/icons";
+import type {Rule} from "antd/es/form";
 import {Trans, useLingui} from "@lingui/react/macro";
 import useRouter from "../store/router";
 import LocalePicker from "./locale_picker";
@@ -9,14 +10,22 @@ import LongPress from "./long_press";
 import type {UpdateMeInput} from "../api/users";
 import {useDeleteMe, useGetUser, useUpdateMe} from "../store/users";
 
-// TODO: loading
 const EditProfile: React.FC = () => {
     const [deleteModal, deleteModalContext] = Modal.useModal();
     const {t} = useLingui();
     const {pop} = useRouter();
-    const {data: me} = useGetUser("me");
+    const {isLoading, data: me} = useGetUser("me");
     const updateMe = useUpdateMe();
     const deleteMe = useDeleteMe();
+
+    const confirmPassword: Rule = ({getFieldValue}) => ({
+        validator: async (_, value): Promise<void> => {
+            if (!value || getFieldValue("password") === value) {
+                return await Promise.resolve();
+            }
+            return await Promise.reject(new Error(t({message: "Password confirmation does not match"})));
+        },
+    });
 
     const handleCancel = pop;
 
@@ -53,10 +62,6 @@ const EditProfile: React.FC = () => {
         });
     };
 
-    if (!me) {
-        return;
-    }
-
     return (
         <Flex
             vertical={true}
@@ -66,57 +71,71 @@ const EditProfile: React.FC = () => {
                 <RouterBack/>
                 <LocalePicker/>
             </Flex>
-            <Form
-                name="editProfile"
-                onFinish={handleSave}
-                initialValues={me}
-            >
-                <Form.Item
-                    name="email"
-                    rules={[{required: true, message: t({message: "Input account Email"})}]}
+            {isLoading ? (
+                <Skeleton active={true}/>
+            ) : (
+                <Form
+                    name="editProfile"
+                    onFinish={handleSave}
+                    initialValues={me}
                 >
-                    <Input
-                        placeholder={t({message: "Email"})}
-                        type="email"
-                    />
-                </Form.Item>
-                <Form.Item
-                    name="username"
-                    rules={[{required: true, message: t({message: "Input account Username"})}]}
-                >
-                    <Input placeholder={t({message: "Username"})}/>
-                </Form.Item>
-                <Form.Item name="password">
-                    <Input.Password
-                        prefix={<LockOutlined/>}
-                        placeholder={t({message: "New Password"})}
-                    />
-                </Form.Item>
-                <Flex justify="right" gap="small">
-                    <Tooltip title={<Trans>Cancel</Trans>}>
-                        <Button
-                            icon={<RollbackOutlined/>}
-                            onClick={handleCancel}
+                    <Form.Item
+                        name="email"
+                        rules={[{required: true, message: t({message: "Input account Email"})}]}
+                    >
+                        <Input
+                            placeholder={t({message: "Email"})}
+                            type="email"
                         />
-                    </Tooltip>
-                    <Tooltip title={<Trans>Save</Trans>}>
-                        <Button
-                            icon={<CheckOutlined/>}
-                            type="primary"
-                            htmlType="submit"
+                    </Form.Item>
+                    <Form.Item
+                        name="username"
+                        rules={[{required: true, message: t({message: "Input account Username"})}]}
+                    >
+                        <Input placeholder={t({message: "Username"})}/>
+                    </Form.Item>
+                    <Form.Item name="password">
+                        <Input.Password
+                            prefix={<LockOutlined/>}
+                            placeholder={t({message: "New Password"})}
                         />
-                    </Tooltip>
-                    <Tooltip title={<Trans>Delete Account</Trans>}>
-                        <Button
-                            danger={true}
-                            type="primary"
-                            icon={<DeleteOutlined/>}
-                            onClick={handleDelete}
+                    </Form.Item>
+                    <Form.Item
+                        name="passwordConfirm"
+                        dependencies={["password"]}
+                        rules={[{required: true, message: t({message: "Confirm your Password"})}, confirmPassword]}
+                    >
+                        <Input.Password
+                            prefix={<LockOutlined/>}
+                            placeholder={t({message: "New Password confirmation"})}
                         />
-                    </Tooltip>
-                </Flex>
-            </Form>
-            {deleteModalContext}
+                    </Form.Item>
+                    <Flex justify="right" gap="small">
+                        <Tooltip title={<Trans>Cancel</Trans>}>
+                            <Button
+                                icon={<RollbackOutlined/>}
+                                onClick={handleCancel}
+                            />
+                        </Tooltip>
+                        <Tooltip title={<Trans>Save</Trans>}>
+                            <Button
+                                icon={<CheckOutlined/>}
+                                type="primary"
+                                htmlType="submit"
+                            />
+                        </Tooltip>
+                        <Tooltip title={<Trans>Delete Account</Trans>}>
+                            <Button
+                                danger={true}
+                                type="primary"
+                                icon={<DeleteOutlined/>}
+                                onClick={handleDelete}
+                            />
+                        </Tooltip>
+                    </Flex>
+                    {deleteModalContext}
+                </Form>
+            )}
         </Flex>
     );
 };
