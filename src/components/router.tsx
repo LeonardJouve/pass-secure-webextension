@@ -1,4 +1,5 @@
 import React, {useEffect} from "react";
+import {Layout, theme} from "antd";
 import useRouter, {Route} from "../store/router";
 import Login from "./login";
 import Register from "./register";
@@ -30,6 +31,7 @@ const COMPONENTS: Record<Status, Partial<Record<Route, React.FC>>> = {
 };
 
 const Router: React.FC = () => {
+    const {token} = theme.useToken();
     const {current, clear} = useRouter();
     const {status} = useAuth();
 
@@ -43,7 +45,16 @@ const Router: React.FC = () => {
     }, [status]);
 
     const Component: React.FC|undefined = COMPONENTS[status][current.route];
-    return Component ? <Component/> : null;
+    return Component ? (
+        <Layout
+            style={{
+                height: "100vh",
+                padding: token.paddingSM,
+            }}
+        >
+            <Component/>
+        </Layout>
+    ) : null;
 };
 
 export default Router;

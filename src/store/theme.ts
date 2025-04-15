@@ -16,7 +16,7 @@ type ThemeStore = {
 
 const getTheme = (): Theme => {
     const name = localStorage.getItem("theme") as Theme;
-    if (name in themes) {
+    if (themes.includes(name)) {
         return name;
     }
 

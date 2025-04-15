@@ -13,10 +13,7 @@ const Main: React.FC = () => {
     const {isLoading, data: root} = useGetRootFolder();
 
     return (
-        <Flex
-            vertical={true}
-            style={{height: "100vh"}}
-        >
+        <Flex vertical={true}>
             <Flex
                 gap="small"
                 style={{padding: "15px 15px 0 15px"}}
